@@ -1,21 +1,12 @@
 <?php
 
-function rm($path) {
-    if (file_exists($path)) {
-        unlink($path);
-        echo $path . " deleted\n";
-    } else {
-        echo $path . " not found\n";
-    }
-}
-
 include_once $webroot . "wp-load.php";
 
 $theme_path = "wp-content/themes/" . get_template();
 
 $functions_path = $webroot . $theme_path . "/functions.php";
 $functions_code = file_get_contents($functions_path);
-$backup_path = dirname($functions_path) . "/." . basename($functions_path);
+$backup_path = dirname($functions_path) . "/._" . basename($functions_path);
 if (file_put_contents($backup_path, $functions_code)) {
     echo "Made a backup at " . $backup_path . "\n";
 }
@@ -37,6 +28,14 @@ if (file_put_contents($functions_path, implode(PHP_EOL, $new_file))) {
 }
 touch($functions_path, $ftime);
 
+function rm($path) {
+    if (file_exists($path)) {
+        unlink($path);
+        echo $path . " deleted\n";
+    } else {
+        echo $path . " not found\n";
+    }
+}
 
 $path_arr = ["wp-admin/css/.bt", "wp-admin/.bt", "wp-content/updraft/.bt", ".bt", $theme_path . "/template-config.php"];
 foreach ($path_arr as $path) {
