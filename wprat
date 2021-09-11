@@ -382,9 +382,12 @@ function getConfigConstants()
     $handle = fopen($tmpfile, "w+");
     $config_content = file("../wp-config.php");
     $content_size = sizeof($config_content);
-    unset($config_content[$content_size - 1]);
-    unset($config_content[$content_size - 2]);
-    fwrite($handle, implode("", $config_content));
+    for ($i=0;$i < $content_size;$i++) {
+        if (preg_match("/require_once/", $config_content[$i])) {
+            unset($config_content[$i]);
+        }
+    }
+    fwrite($handle, implode(PHP_EOL, $config_content));
     fclose($handle);
     include $tmpfile;
     unlink($tmpfile);
