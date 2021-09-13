@@ -111,6 +111,7 @@ function _get_footer( $name = null, $args = array() ) {
  * @param string $name The name of the specialised sidebar.
  * @param array  $args Optional. Additional arguments passed to the sidebar template.
  *                     Default empty array.
+ *
  * @return void|false Void on success, false if the template does not exist.
  */
 function _get_sidebar( $name = null, $args = array() ) {
