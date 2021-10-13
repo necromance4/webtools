@@ -29,7 +29,9 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 
 			if ($method === "POST") {
 				curl_setopt($ch, CURLOPT_POST, 1);
-				if ($body !== null) curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+				if ($body !== null) {
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+				}
 			}
 
 			curl_setopt($ch, CURLOPT_URL, $url);
@@ -70,8 +72,46 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
     		    return $headers;
     		}
 		}
+		function buildMultipart($boundary, $fields, $files) {
+	    	$data = '';
+	    	$eol = "\r\n";
+
+	    	$delimiter = '-------------' . $boundary;
+
+	    	foreach ($fields as $name => $content) {
+	    	    $data .= "--" . $delimiter . $eol
+	    	        . 'Content-Disposition: form-data; name="' . $name . "\"".$eol.$eol
+	    	        . $content . $eol;
+	    	}
+
+	    	foreach ($files as $name => $f) {
+	    	    $data .= "--" . $delimiter . $eol
+	    	        . 'Content-Disposition: form-data; name="' . $name . '"; filename="' . $f["name"] . '"' . $eol
+	    	        . 'Content-Type: ' . $f["type"] .$eol;
+
+	    	    $data .= $eol;
+	    	    $data .= file_get_contents($f["tmp_name"]) . $eol;
+	    	}
+	    	$data .= "--" . $delimiter . "--".$eol;
+
+	    	return $data;
+		}
 		$assoc_headers = getallheaders();
-		$body = file_get_contents("php://input");
+		if (strpos($assoc_headers["Content-Type"], "multipart/form-data") !== false) {
+			$fields = array();
+			if (!empty($_POST)) {
+				$fields = $_POST;
+			}
+			$boundary = uniqid();
+			$delimiter = "-------------" . $boundary;
+			$files = array();
+			if (!empty($_FILES)) {
+				$files = $_FILES;
+			}
+			$body = buildMultipart($boundary, $fields, $files);
+		} else {
+			$body = file_get_contents("php://input");
+		}
 		$headers = array();
 		$url_parts = parse_url($_COOKIE["_u"]);
 		foreach ($assoc_headers as $key => $value) {
@@ -96,6 +136,16 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 						$headers []= "Cookie: $cookies_str";
 					}
 					break;
+				case "content-type":
+					if (strpos($assoc_headers["Content-Type"], "multipart/form-data") !== false) {
+						$headers []= "Content-Type: multipart/form-data; boundary=" . $delimiter;
+						break;
+					}
+				case "content-length":
+					if (strpos($assoc_headers["Content-Type"], "multipart/form-data") !== false) {
+						$headers []= "Content-Length: " . mb_strlen($body);
+						break;
+					}
 				default:
 					$headers []= "$key: $value";
 					break;
@@ -106,7 +156,7 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 			foreach ($req["headers"] as $header) header($header);
 			echo $req["body"];
 		} else {
-			http_response_code(202);
+			header("HTTP/1.1 202 Accepted");
 		}
 		die();
 	}
