@@ -7,6 +7,7 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 				if(ini_get("allow_url_fopen")) {
 					$opts_array = array(
 						"method" => $method,
+						"ignore_errors" => true,
 					);
 					if ($headers !== null) $opts_array["header"] = $headers;
 					if ($method !== "GET" && $body !== null) {
@@ -34,6 +35,8 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_AUTOREFERER, true);
 			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 			curl_setopt($ch, CURLOPT_TIMEOUT, 300);
 			curl_setopt($ch, CURLOPT_HEADER, true);
