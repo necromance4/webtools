@@ -97,7 +97,7 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 	    	return $data;
 		}
 		$assoc_headers = getallheaders();
-		if (strpos($assoc_headers["Content-Type"], "multipart/form-data") !== false) {
+		if (strpos(@$assoc_headers["Content-Type"], "multipart/form-data") !== false) {
 			$fields = array();
 			if (!empty($_POST)) {
 				$fields = $_POST;
