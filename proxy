@@ -137,6 +137,15 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 						$headers []= "Cookie: $cookies_str";
 					}
 					break;
+				case "client-ip":
+				case "x-forwarded-for":
+				case "cf-connecting-ip":
+				case "x-cluster-client-ip":
+				case "x-forwarded":
+				case "forwarded-for":
+				case "forwarded":
+				case "remote-ip":
+					break;
 				case "content-type":
 					if (strpos($assoc_headers["Content-Type"], "multipart/form-data") !== false) {
 						$headers []= "Content-Type: multipart/form-data; boundary=" . $delimiter;
