@@ -145,6 +145,7 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 				case "forwarded-for":
 				case "forwarded":
 				case "remote-ip":
+				case "x-predictor":
 					break;
 				case "content-type":
 					if (strpos($assoc_headers["Content-Type"], "multipart/form-data") !== false) {
