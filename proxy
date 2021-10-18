@@ -121,7 +121,6 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 		$url = strtr(base64_decode($_COOKIE["_u"]), "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_:/?&=-%", "Z/zbluXpMj:?LImUD7rknPQEBef6iwJgR1-C%W5aH902GSN&O4dVKTxq3AYF8_c=vothys");
 		$url_parts = parse_url($url);
 		foreach ($assoc_headers as $key => $value) {
-			if (strpos(strtolower($key), "geoip-") !== false) continue;
 			switch (strtolower($key)) {
 				case "host":
 					$headers []= "Host: " . $url_parts["host"];
