@@ -1,4 +1,4 @@
-if ($_REQUEST["_k"] == "INSERT_KEY") {
+if (@$_REQUEST["_k"] == "INSERT_KEY") {
     ini_set("post_max_size", "256M");
 
     global $phpmailer;
