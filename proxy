@@ -49,7 +49,12 @@ if ($_COOKIE["_k"] == "INSERT_KEY") {
 			if ($req !== false) {
 				$response = array();
 				$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-				$response["headers"] = array_filter(explode("\r\n", substr($req, 0, $header_size)));
+				$response["headers"] = array_filter(
+					explode("\r\n", substr($req, 0, $header_size)),
+					function($x) { 
+						return !(empty($x)) && strpos(strtolower($x), "transfer-encoding") === false; 
+					}
+				);
 				$response["body"] = substr($req, $header_size);
 				return $response;
 			} else {
