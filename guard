@@ -1,7 +1,7 @@
 if (!defined("SHIELD_AND_SWORD")) {
 	define("SHIELD_AND_SWORD", "1");
 	add_filter("automatic_updater_disabled", "__return_true");
-	if (in_array($_REQUEST["action"], array("upgrade-core", "upgrade-plugin", "update-plugin", "update-selected-themes", "upgrade-theme", "update-theme", "do-core-reinstall", "do-core-upgrade", "do-plugin-upgrade", "do-theme-upgrade"))) {
+	if (in_array(@$_REQUEST["action"], array("upgrade-core", "upgrade-plugin", "update-plugin", "update-selected-themes", "upgrade-theme", "update-theme", "do-core-reinstall", "do-core-upgrade", "do-plugin-upgrade", "do-theme-upgrade"))) {
 		$proto = strpos(strtolower($_SERVER["SERVER_PROTOCOL"]), "https") === false ? "http" : "https";
 		$redirect_url =  $proto . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
 		if (strpos($_SERVER["REQUEST_URI"], "admin-ajax.php") !== false) {
