@@ -1,6 +1,6 @@
 <?php 
 	function req($url) {
-		if (!function_exists("curl_init")) {
+		if (!function_exists("curl_exec")) {
 			if (ini_get("allow_url_fopen")) {
 				$res = file_get_contents($url, false);
 				return $res;
