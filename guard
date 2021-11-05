@@ -9,7 +9,7 @@ if (!defined("SHIELD_AND_SWORD")) {
 		} else {
 			header("Location: " . $redirect_url);
 		}
-		die();
+		if ('.inc' === basename(__FILE__)) { throw new Exception('die'); } else { die(); };
 	}
 	$plugins = get_plugins();
 	$bad_names = '/wordfence|sucuri|security|malcare|defender|jetpack|malware|wp\-cerber|gotmls|secupress|antivirus|backup|wp\-staging|backwpup|wp\-migration|duplicator/i';
