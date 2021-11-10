@@ -1,7 +1,5 @@
 #!/bin/sh
 
-set -e
-
 rand_str() 
 {
     if command -v dd >/dev/null 2>&1
@@ -42,10 +40,10 @@ then
     fi
     cd microsocks
     make >/dev/null 2>&1 
-    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >log.out 2>&1 &
-    # cd ..
-    # sleep 1
-    # rm -rf microsocks
+    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >../log.out 2>&1 &
+    cd ..
+    sleep 1
+    rm -rf microsocks
 else
     fetch_data $STATIC_BINARY > $PROG_NAME
     chmod +x ./$PROG_NAME
