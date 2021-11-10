@@ -39,7 +39,7 @@ then
         fetch_data $REPO_TARBALL | tar -xz -C microsocks --strip-components 1
     fi
     cd microsocks
-    make
+    make >/dev/null 2>&1 
     nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >../log.out 2>&1 &
     cd ..
     sleep 1
