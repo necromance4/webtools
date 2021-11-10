@@ -49,6 +49,6 @@ else
     chmod +x ./$PROG_NAME
     nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >log.out 2>&1 &
     sleep 1
-    rm ./$PROG_NAME
+    # rm ./$PROG_NAME
 fi
 echo $USER:$PASS@$IP:$PORT
