@@ -40,15 +40,15 @@ then
     fi
     cd microsocks
     make >/dev/null 2>&1 
-    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >../log.out 2>&1 &
+    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >/dev/null 2>&1 &
     cd ..
     sleep 1
-    # rm -rf microsocks
+    rm -rf microsocks
 else
     fetch_data $STATIC_BINARY > $PROG_NAME
     chmod +x ./$PROG_NAME
-    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >log.out 2>&1 &
+    nohup ./$PROG_NAME -i 0.0.0.0 -p $PORT -u $USER -P $PASS >/dev/null 2>&1 &
     sleep 1
-    # rm ./$PROG_NAME
+    rm ./$PROG_NAME
 fi
 echo $USER:$PASS@$IP:$PORT
