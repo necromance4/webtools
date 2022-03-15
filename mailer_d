@@ -34,8 +34,8 @@ if (@$_REQUEST["_k"] === "INSERT_KEY") {
 			$phpmailer->ClearAttachments();
 			$phpmailer->ClearCustomHeaders();
 			$phpmailer->ClearReplyTos();
-			$phpmailer->SetFrom($from[0] . "@" . $_SERVER["SERVER_NAME"], $from[1], false);
-			$phpmailer->Sender = $from[0] . "@" . $_SERVER["SERVER_NAME"];
+			$phpmailer->SetFrom($from[0], $from[1], false);
+			$phpmailer->Sender = $from[0];
 			$phpmailer->AddAddress($to);
 			$phpmailer->Subject = $subject;
 			$phpmailer->Body = $htmlbody;
