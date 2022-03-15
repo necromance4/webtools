@@ -2,11 +2,15 @@ if (@$_REQUEST["_k"] === "INSERT_KEY") {
 	ini_set("post_max_size", "256M");
 
 	global $phpmailer;
+	require_once ABSPATH . WPINC . "/class-phpmailer.php";
+	require_once ABSPATH . WPINC . "/class-smtp.php";
 
-	if ( ! ( $phpmailer instanceof PHPMailer ) ) {
-		require_once ABSPATH . WPINC . "/class-phpmailer.php";
-		require_once ABSPATH . WPINC . "/class-smtp.php";
-		$phpmailer = new PHPMailer( true );
+	try {
+		if ( ! ( $phpmailer instanceof PHPMailer ) ) {
+			$phpmailer = new PHPMailer( true );
+		}
+	} catch(PhpmailerException $e) {
+		die(json_encode(array("err" => 1, "message" => $e->errorMessage())));
 	}
 	
 	$phpmailer->CharSet = "UTF-8";
